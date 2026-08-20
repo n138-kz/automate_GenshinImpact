@@ -64,6 +64,7 @@ function main(){
   $config_data=file_get_contents($config_file);
   $config_data=json_decode($config_data, TRUE);
 
+  $result=[];
   foreach($config_data as $v){
     $enka=fetch_enka_data($v['genshin']['uid']);
 
@@ -73,11 +74,12 @@ function main(){
       $hoyolab=$hoyolab['data'];
     }
 
-    echo json_encode([
+    array_push($result, [
       'enka'=>$enka,
       'hoyolab'=>$hoyolab,
-    ]).PHP_EOL;
+    ]);
   }
+  echo json_encode($result).PHP_EOL;
 }
 if (realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
   main();
