@@ -54,7 +54,7 @@ function fetch_hoyolab_daily_note(int $uid, array $cookies): ?array {
 
   return $res ? json_decode($res, true) : null;
 }
-
+function main(){
 $config_file=__DIR__.'/users.json';
 
 if(!file_exists($config_file)){
@@ -80,4 +80,8 @@ foreach($config_data as $v){
     'enka'=>$enka,
     'hoyolab'=>$hoyolab,
   ]).PHP_EOL;
+}
+}
+if (realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
+  main();
 }
