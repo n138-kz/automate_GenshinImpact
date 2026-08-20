@@ -66,9 +66,6 @@ function main(){
 
   foreach($config_data as $v){
     $enka=fetch_enka_data($v['genshin']['uid']);
-    unset($enka['playerInfo']['showAvatarInfoList']);
-    unset($enka['playerInfo']['showNameCardIdList']);
-    unset($enka['avatarInfoList']);
 
     $cookies = $v['hoyolab']['cookies'] ?? [];
     $hoyolab = fetch_hoyolab_daily_note($v['genshin']['uid'], $cookies);
