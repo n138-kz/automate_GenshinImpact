@@ -55,32 +55,32 @@ function fetch_hoyolab_daily_note(int $uid, array $cookies): ?array {
   return $res ? json_decode($res, true) : null;
 }
 function main(){
-$config_file=__DIR__.'/users.json';
+  $config_file=__DIR__.'/users.json';
 
-if(!file_exists($config_file)){
-  die('Not such File or Directory: '.$config_file.PHP_EOL);
-}
-
-$config_data=file_get_contents($config_file);
-$config_data=json_decode($config_data, TRUE);
-
-foreach($config_data as $v){
-  $enka=fetch_enka_data($v['genshin']['uid']);
-  unset($enka['playerInfo']['showAvatarInfoList']);
-  unset($enka['playerInfo']['showNameCardIdList']);
-  unset($enka['avatarInfoList']);
-
-  $cookies = $v['hoyolab']['cookies'] ?? [];
-  $hoyolab = fetch_hoyolab_daily_note($v['genshin']['uid'], $cookies);
-  if($hoyolab['retcode']===0 && isset($hoyolab['data'])){
-    $hoyolab=$hoyolab['data'];
+  if(!file_exists($config_file)){
+    die('Not such File or Directory: '.$config_file.PHP_EOL);
   }
 
-  echo json_encode([
-    'enka'=>$enka,
-    'hoyolab'=>$hoyolab,
-  ]).PHP_EOL;
-}
+  $config_data=file_get_contents($config_file);
+  $config_data=json_decode($config_data, TRUE);
+
+  foreach($config_data as $v){
+    $enka=fetch_enka_data($v['genshin']['uid']);
+    unset($enka['playerInfo']['showAvatarInfoList']);
+    unset($enka['playerInfo']['showNameCardIdList']);
+    unset($enka['avatarInfoList']);
+
+    $cookies = $v['hoyolab']['cookies'] ?? [];
+    $hoyolab = fetch_hoyolab_daily_note($v['genshin']['uid'], $cookies);
+    if($hoyolab['retcode']===0 && isset($hoyolab['data'])){
+      $hoyolab=$hoyolab['data'];
+    }
+
+    echo json_encode([
+      'enka'=>$enka,
+      'hoyolab'=>$hoyolab,
+    ]).PHP_EOL;
+  }
 }
 if (realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
   main();
