@@ -1,8 +1,8 @@
-FROM php:8.5-fpm
+FROM php:8.5-fpm-alpine
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-RUN apt-get update && apt-get install -y \
+RUN apk --no-cache add \
     tree \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    jq
 
 WORKDIR /var/www/html
