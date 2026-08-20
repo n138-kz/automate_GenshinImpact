@@ -23,6 +23,7 @@ dump.*
 *.pem
 id_rsa
 id_ed25519
+users.json
 
 # AWS, GCP, Azure, Clound Credential file
 credentials.csv
