@@ -40,6 +40,8 @@
 ## Refs
 
 - [![](https://www.google.com/s2/favicons?size=64&domain=https://github.com)automate_GenshinImpact](https://github.com/n138-kz/automate_GenshinImpact/)
+- [![](https://www.google.com/s2/favicons?size=64&domain=https://github.com)Util_of_Genshin-Impact](https://github.com/n138-kz/Util_of_Genshin-Impact)
+- [![](https://www.google.com/s2/favicons?size=64&domain=https://github.com)Route_Genshin-Impact](https://github.com/n138-kz/Route_Genshin-Impact/)
 
 ## License
 
