@@ -16,7 +16,7 @@ services:
       dockerfile: ./container-app-build/Dockerfile
     restart: unless-stopped
     volumes:
-      - ./docs:/var/www/html
+      - ./container-app:/app:ro
     environment:
       GOOGLE_RECAPTCHA_SITE_KEY: "${GOOGLE_RECAPTCHA_SITE_KEY:-null}"
       GOOGLE_RECAPTCHA_SECRET_KEY: "${GOOGLE_RECAPTCHA_SECRET_KEY:-null}"
