@@ -58,19 +58,6 @@ function fetch_hoyolab_daily_note(int $uid, array $cookies): ?array {
 $config_file=__DIR__.'/users.json';
 
 if(!file_exists($config_file)){
-  $config_data=[[
-    'genshin'=>[
-      'uid'=>null,
-    ],
-    'hoyolab'=>[
-      'cookies'=>[
-        'ltuid'=>null,
-        'ltmid'=>null,
-        'ltoken'=>null,
-      ],
-    ],
-  ]];
-  file_put_contents($config_file, json_encode($config_data));
   die('Not such File or Directory: '.$config_file);
 }
 
