@@ -10,6 +10,24 @@ services:
     profiles:
       - all
       - web
+  cron-web:
+    image: alpine
+    # curlをインストール後、whileループで60秒ごとにcurlを実行し続ける
+    command: >
+      sh -c "
+      apk --no-cache add curl jq &&
+      sleep 10 &&
+      while :; do
+        curl -s -L http://web/ | jq -c '.[].hoyolab | [.current_resin, .max_resin, .resin_recovery_time] | [.[] | tonumber]';
+        sleep 30;
+      done
+      "
+    restart: unless-stopped
+    depends_on:
+      - web
+    profiles:
+      - all
+      - web
   app:
     build:
       context: .
