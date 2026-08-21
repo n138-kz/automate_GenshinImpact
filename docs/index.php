@@ -55,7 +55,7 @@ function fetch_hoyolab_daily_note(int $uid, array $cookies): ?array {
   return $res ? json_decode($res, true) : null;
 }
 function main(){
-  $config_file=__DIR__.'/users.json';
+  $config_file='/app'.'/users.json';
 
   if(!file_exists($config_file)){
     die('Not such File or Directory: '.$config_file.PHP_EOL);
