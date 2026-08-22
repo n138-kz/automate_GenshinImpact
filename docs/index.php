@@ -1,4 +1,5 @@
 <?php
+ini_set('display_errors', 0);
 function fetch_enka_data(int $uid=0){
   $options=[
     'http' => [
