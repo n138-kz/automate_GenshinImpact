@@ -79,6 +79,79 @@ function flatten_json($data, string $parent_key = ''): array {
 
   return $items;
 }
+function insertDB($datalist=[]){
+  $database_host = $_ENV['INTERNAL_DB_HOST'] ?? 'db';
+  $database_port = $_ENV['INTERNAL_DB_PORT'] ?? '5432';
+  $database_db   = $_ENV['INTERNAL_DB_DATABASE'] ?? 'myapp';
+  $database_user = $_ENV['INTERNAL_DB_USERNAME'] ?? 'postgres';
+  $database_pass = $_ENV['INTERNAL_DB_PASSWORD'] ?? 'password';
+  $database_conn = "pgsql:host={$database_host};port={$database_port};dbname={$database_db}";
+
+  if(!is_array($datalist)){
+    return 'arg "datalist" is not list.';
+  }
+
+  try {
+    $pdo = new PDO($database_conn, $database_user, $database_pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+    ]);
+
+    /* * get id (RETURNING id を使うことで安全かつ確実に取得) */
+    $sql = 'INSERT INTO users (updated_at) VALUES (CURRENT_TIMESTAMP) RETURNING id;';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $newId = $stmt->fetchColumn();
+
+    for($i=0;$i<count($datalist);$i++){
+      $datalist[$i]=explode('=', $datalist[$i]);
+      $datalist[$i][0]=str_replace('.', '_', $datalist[$i][0]);
+    }
+
+    /* * not exist column then add column */
+    foreach ($datalist as $value) {
+        $table = 'users';
+        $column = strtolower($value[0]);
+        $valuedata = $value[1];
+
+        $sql = 'SELECT COUNT(*)
+                FROM information_schema.columns
+                WHERE table_catalog = current_database()
+                  AND table_schema = \'public\'
+                  AND table_name = ?
+                  AND column_name = ?';
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$table, $column]);
+        $exists = (int)$stmt->fetchColumn() > 0;
+
+        if (!$exists) {
+            $datatype='TEXT';
+            $datatype=is_int($valuedata)?'INT':$datatype;
+            $datatype=is_float($valuedata)?'DOUBLE PRECISION':$datatype; // PostgresはDOUBLEではなくDOUBLE PRECISION
+            $sql = "ALTER TABLE \"{$table}\" ADD COLUMN \"{$column}\" {$datatype} DEFAULT NULL;";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute();
+        }
+    }
+
+    /* * update data */
+    foreach($datalist as $value){
+      $column = strtolower($value[0]);
+      $valuedata = $value[1];
+
+      // ★重要修正: WHERE id = ? を追加しないと全行が書き換わってしまいます
+      $sql = "UPDATE \"users\" SET \"{$column}\" = ? WHERE id = ?;";
+      $stmt = $pdo->prepare($sql);
+      $stmt->execute([$valuedata, $newId]);
+    }
+  } catch (PDOException $e) {
+    error_log('PDO Error has occured: '.$e->getMessage());
+    return 'PDO Error has occured: '.$e->getMessage();
+  }
+
+  return NULL;
+}
+
 function main(){
   $config_file='/app'.'/users.json';
 
