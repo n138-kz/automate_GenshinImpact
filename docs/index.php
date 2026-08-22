@@ -54,6 +54,31 @@ function fetch_hoyolab_daily_note(int $uid, array $cookies): ?array {
 
   return $res ? json_decode($res, true) : null;
 }
+function flatten_json($data, string $parent_key = ''): array {
+  $items = [];
+
+  // 連想配列（連想キーを持つ配列）の判定
+  if (is_array($data) && (empty($data) || array_keys($data) !== range(0, count($data) - 1))) {
+    foreach ($data as $k => $v) {
+      $new_key = $parent_key !== '' ? "{$parent_key}.{$k}" : $k;
+      $items = array_merge($items, flatten_json($v, $new_key));
+    }
+  }
+  // インデックス配列（リスト）の判定
+  elseif (is_array($data)) {
+    foreach ($data as $item) {
+      $items = array_merge($items, flatten_json($item, $parent_key));
+    }
+  }
+  // スカラー値（文字列、数値、真偽値など）
+  else {
+    // nullやbooleanなどの出力調整が必要な場合はここでハンドリング
+    $val_str = is_bool($data) ? ($data ? 'True' : 'False') : (string)$data;
+    $items[] = "{$parent_key}={$val_str}";
+  }
+
+  return $items;
+}
 function main(){
   $config_file='/app'.'/users.json';
 
@@ -77,6 +102,10 @@ function main(){
     array_push($result, [
       'enka'=>$enka,
       'hoyolab'=>$hoyolab,
+      'flatten_json'=>flatten_json([
+        'enka'=>$enka,
+        'hoyolab'=>$hoyolab,
+      ]),
     ]);
   }
   echo json_encode($result).PHP_EOL;
