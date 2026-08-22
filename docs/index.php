@@ -164,6 +164,8 @@ function main(){
   $config_data=json_decode($config_data, TRUE);
 
   $result=[];
+  $dbDataQueue = []; // バックグラウンド処理用にデータを一時保存
+
   foreach($config_data as $v){
     $enka=fetch_enka_data($v['genshin']['uid']);
 
@@ -173,17 +175,36 @@ function main(){
       $hoyolab=$hoyolab['data'];
     }
 
-    array_push($result, [
+    $item = [
       'enka'=>$enka,
       'hoyolab'=>$hoyolab,
-      'flatten_json'=>flatten_json([
-        'enka'=>$enka,
-        'hoyolab'=>$hoyolab,
-      ]),
-    ]);
+    ];
+
+    array_push($result, $item);
+    $dbDataQueue[] = flatten_json($item);
   }
+
+  // 1. レスポンスを出力
+  header('Content-Type: application/json');
   echo json_encode($result).PHP_EOL;
+
+  // 2. ブラウザ・クライアントへ即座にレスポンスを返し接続を切断する
+  if (function_exists('fastcgi_finish_request')) {
+    fastcgi_finish_request();
+  } else {
+    // CLIやFastCGI以外の環境用のフラッシュ処理
+    if (ob_get_level() > 0) {
+      ob_end_flush();
+    }
+    flush();
+  }
+
+  // 3. 接続切断後にバックグラウンドでDB処理を実行
+  foreach ($dbDataQueue as $flatData) {
+    insertDB($flatData);
+  }
 }
+
 if (realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
   main();
 }
