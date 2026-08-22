@@ -18,7 +18,7 @@ services:
       apk --no-cache add curl jq &&
       sleep 10 &&
       while :; do
-        curl -s -L http://web/ | jq -c '.[].hoyolab | [.current_resin, .max_resin, .resin_recovery_time] | [.[] | tonumber]';
+        curl -s -L http://web/ | jq -c '.[] | [.enka.uid, .hoyolab.current_resin, .hoyolab.max_resin, .hoyolab.resin_recovery_time] | [.[] | tonumber]';
         sleep 30;
       done
       "
