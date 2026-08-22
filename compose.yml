@@ -41,3 +41,32 @@ services:
       GOOGLE_RECAPTCHA_SECRET_KEY: "${GOOGLE_RECAPTCHA_SECRET_KEY:-null}"
       IPINFO_TOKEN: "${IPINFO_TOKEN:-null}"
       DISCORD_WEBHOOK_URL: "${DISCORD_WEBHOOK_URL:-null}"
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: myapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./container-db-build:/docker-entrypoint-initdb.d/
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      default:
+        aliases:
+          - database
+  db_admin:
+    image: dpage/pgadmin4:latest
+    restart: no
+    ports:
+      - "8081:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${INTERNAL_PGADMIN_EMAIL:-sqladmin@localhost.local}
+      PGADMIN_DEFAULT_PASSWORD: ${INTERNAL_PGADMIN_PASSWORD:-password}
+    volumes:
+      - pgadmin-store:/var/lib/pgadmin
+    depends_on:
+      - db
+volumes:
+  pgdata:
+  pgadmin-store:
