@@ -10,6 +10,8 @@ services:
     profiles:
       - all
       - web
+    ports:
+      - "8080-65535:80"
   cron-web:
     image: alpine
     # curlをインストール後、whileループで60秒ごとにcurlを実行し続ける
