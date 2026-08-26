@@ -186,10 +186,6 @@ function main(){
       $hoyolab=$hoyolab['data'];
     }
 
-    $item = [
-      'enka'=>$enka,
-      'hoyolab'=>$hoyolab,
-    ];
 
     array_push($result, $item);
     $dbDataQueue[] = flatten_json($item);
