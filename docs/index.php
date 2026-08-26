@@ -140,7 +140,6 @@ function insertDB($datalist=[]){
       $column = strtolower($value[0]);
       $valuedata = $value[1];
 
-      // ★重要修正: WHERE id = ? を追加しないと全行が書き換わってしまいます
       $sql = "UPDATE \"users\" SET \"{$column}\" = ? WHERE id = ?;";
       $stmt = $pdo->prepare($sql);
       $stmt->execute([$valuedata, $newId]);
