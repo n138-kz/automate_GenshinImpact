@@ -225,14 +225,37 @@ function main(){
       }
     }
 
+    if(FALSE){
+    }elseif(isset($_GET['get'])&&$_GET['get']==='latest'){
+      /* * latest value */
+      $item = [
+        'UPDATED_AT'=>(new DateTimeImmutable('now', new DateTimeZone('Asia/Tokyo')))->format('Y-m-d\TH:i:s.vP'),
+        'PLAYER_NAME'=>$enka['playerInfo']['nickname'],
+        'PLAYER_SIGNATURE'=>$enka['playerInfo']['signature'],
+        'ENKA_UID'=>$enka['uid'],
+        'CURRENT_RESIN'=>$hoyolab['current_resin'],
+        'MAX_RESIN'=>$hoyolab['max_resin'],
+        'CURRENT_RESIN_PERCENT'=>($hoyolab['current_resin']/$hoyolab['max_resin']*100),
+        'RESIN_RECOVERY_TIME'=>sprintf('%d:%02d:%02d',
+          floor((int)$hoyolab['resin_recovery_time']/3600),
+          floor(((int)$hoyolab['resin_recovery_time']%3600)/60),
+          (int)$hoyolab['resin_recovery_time']%60
+        ),
+      ];
+      if($item['CURRENT_RESIN']===$item['MAX_RESIN']){
+        unset($item['RESIN_RECOVERY_TIME']);
+      }
+    }else{
+      $item = [
+        'enka'=>$enka,
+        'hoyolab'=>$hoyolab,
+      ];
+    }
 
     array_push($result, $item);
     $dbDataQueue[] = flatten_json($item);
   }
 
-  // 1. レスポンスを出力
-  header('Content-Type: application/json');
-  echo json_encode($result).PHP_EOL;
   /* * Notice to Discord * */
   {
     $payload_json = json_encode($discord_notifies_payload_data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
