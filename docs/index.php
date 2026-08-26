@@ -277,6 +277,83 @@ function main(){
     }
   }
 
+  if(isset($_GET['get'])&&$_GET['get']==='history'){
+    try {
+      $database_host = $_ENV['INTERNAL_DB_HOST'] ?? 'db';
+      $database_port = $_ENV['INTERNAL_DB_PORT'] ?? '5432';
+      $database_db   = $_ENV['INTERNAL_DB_DATABASE'] ?? 'myapp';
+      $database_user = $_ENV['INTERNAL_DB_USERNAME'] ?? 'postgres';
+      $database_pass = $_ENV['INTERNAL_DB_PASSWORD'] ?? 'password';
+      $database_conn = "pgsql:host={$database_host};port={$database_port};dbname={$database_db}";
+
+      $pdo = new PDO($database_conn, $database_user, $database_pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+      ]);
+      $sql = 'SELECT * FROM USERS_CURRENT_RESIN_LOG_VIEW LIMIT 2000;';
+      $stmt = $pdo->prepare($sql);
+      $stmt->execute();
+
+      $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      $html_output = '';
+      $html_output .= '';
+      $html_output .= '<!DOCTYPE html>';
+      $html_output .= '<html>';
+      $html_output .= '<head>';
+      $html_output .= '<meta charset="utf-8">';
+      $html_output .= '<meta http-equiv="X-UA-Compatible" content="IE=edge">';
+      $html_output .= '<meta http-equiv="Pragma" content="no-cache">';
+      $html_output .= '<meta http-equiv="Cache-Control" content="no-cache">';
+      $html_output .= '<meta http-equiv="Expires" content="0">';
+      $html_output .= '<meta http-equiv="refresh" content="30">';
+      $html_output .= '<link rel="preconnect dns-prefetch" href="//github.com">';
+      $html_output .= '<link rel="preconnect dns-prefetch" href="//n138-kz.github.io">';
+      $html_output .= '<link rel="preconnect dns-prefetch" href="//code.jquery.com">';
+      $html_output .= '<link rel="preconnect dns-prefetch" href="//accounts.google.com">';
+      $html_output .= '<link rel="preconnect dns-prefetch" href="//www.google.com">';
+      $html_output .= '<link rel="stylesheet" type="text/css" href="https://n138-kz.github.io/lib/master.css?t=0" />';
+      $html_output .= '<script src="https://n138-kz.github.io/lib/master.js"></script>';
+      $html_output .= '<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>';
+      $html_output .= '<script src="https://accounts.google.com/gsi/client" async defer></script>';
+      $html_output .= '<script src="https://www.google.com/recaptcha/api.js?render=6LfCHdcUAAAAAOwkHsW_7W7MfoOrvoIw9CXdLRBA"></script>';
+      $html_output .= '<script src="https://n138-kz.github.io/lib/grecaptcha.js"></script>';
+      $html_output .= '</head>';
+      $html_output .= '<body>';
+      $html_output .= '<table border="1">';
+      $html_output .= '<tr>';
+      $html_output .= '<th>updated_at</th>';
+      $html_output .= '<th>player_name</th>';
+      $html_output .= '<th>player_signature</th>';
+      $html_output .= '<th>enka_uid</th>';
+      $html_output .= '<th>current_resin</th>';
+      $html_output .= '<th>max_resin</th>';
+      $html_output .= '<th>current_resin_percent</th>';
+      $html_output .= '<th>resin_recovery_time</th>';
+      $html_output .= '</tr>';
+      foreach($result as $r_k1 => $r_v1){
+        $html_output .= '<tr>';
+        $html_output .= '<td>'.$r_v1['updated_at'].'</td>';
+        $html_output .= '<td>'.$r_v1['player_name'].'</td>';
+        $html_output .= '<td>'.$r_v1['player_signature'].'</td>';
+        $html_output .= '<td>'.$r_v1['enka_uid'].'</td>';
+        $html_output .= '<td>'.$r_v1['current_resin'].'</td>';
+        $html_output .= '<td>'.$r_v1['max_resin'].'</td>';
+        $html_output .= '<td>'.$r_v1['current_resin_percent'].'</td>';
+        $html_output .= '<td>'.$r_v1['resin_recovery_time'].'</td>';
+        $html_output .= '</tr>';
+      }
+      $html_output .= '</table>';
+      $html_output .= '</body>';
+      $html_output .= '</html>';
+
+      echo $html_output;
+    }catch(\PDOException $e){
+      error_log('PDO Exception: '.$e->getMessage());
+    }
+  }else{
+    // 1. レスポンスを出力
+    header('Content-Type: application/json');
+    echo json_encode($result, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT).PHP_EOL;
+  }
 
   // 2. ブラウザ・クライアントへ即座にレスポンスを返し接続を切断する
   if (function_exists('fastcgi_finish_request')) {
