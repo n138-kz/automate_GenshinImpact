@@ -114,6 +114,10 @@ function insertDB($datalist=[]){
         $column = strtolower($value[0]);
         $valuedata = $value[1];
 
+  if($column===''){
+      continue;
+  }
+
         $sql = 'SELECT COUNT(*)
                 FROM information_schema.columns
                 WHERE table_catalog = current_database()
@@ -139,6 +143,10 @@ function insertDB($datalist=[]){
     foreach($datalist as $value){
       $column = strtolower($value[0]);
       $valuedata = $value[1];
+
+      if($column===''){
+        continue;
+      }
 
       $sql = "UPDATE \"users\" SET \"{$column}\" = ? WHERE id = ?;";
       $stmt = $pdo->prepare($sql);
