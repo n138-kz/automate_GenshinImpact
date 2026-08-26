@@ -173,6 +173,10 @@ function main(){
   $result=[];
   $dbDataQueue = []; // バックグラウンド処理用にデータを一時保存
 
+  $discord_notifies_payload_data = [
+    'content' => null,
+    'embeds' => [],
+  ];
   foreach($config_data as $v){
     $enka=fetch_enka_data($v['genshin']['uid']);
 
