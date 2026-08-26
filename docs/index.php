@@ -334,7 +334,7 @@ function main(){
         $html_output .= '<td>'.$r_v1['updated_at'].'</td>';
         $html_output .= '<td>'.$r_v1['player_name'].'</td>';
         $html_output .= '<td>'.$r_v1['player_signature'].'</td>';
-        $html_output .= '<td>'.$r_v1['enka_uid'].'</td>';
+        $html_output .= '<td><a href="https://enka.network/u/'.$r_v1['enka_uid'].'" target="enka.network.u.'.$r_v1['enka_uid'].'">'.$r_v1['enka_uid'].'</a></td>';
         $html_output .= '<td>'.$r_v1['current_resin'].'</td>';
         $html_output .= '<td>'.$r_v1['max_resin'].'</td>';
         $html_output .= '<td>'.$r_v1['current_resin_percent'].'</td>';
