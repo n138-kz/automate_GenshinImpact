@@ -312,7 +312,7 @@ function main(){
 				'Content-Type: application/json',
 			]);
 			$curl_result = json_decode(curl_exec($ch), true);
-			$curl_result['url']=$v['discord']['webhook']['url'];
+			$curl_result['url']="{$v['discord']['webhook']['url']}/messages/" . ( $curl_result['id'] ?? 'null');
 
 			insertDB_discord_webhooks_log([
 				'rawjson' => json_encode($curl_result),
