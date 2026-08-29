@@ -336,7 +336,7 @@ function main(){
 			$pdo = new PDO($database_conn, $database_user, $database_pass, [
 				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
 			]);
-			$sql = "SELECT * FROM GENSHIN_STATUS_LOG_VIEW_PHP WHERE UPDATED_AT >= NOW() - INTERVAL '1 day';";
+			$sql = "SELECT * FROM GENSHIN_STATUS_LOG_VIEW_PHP WHERE UPDATED_AT >= NOW() - INTERVAL '1 day' ORDER BY UPDATED_AT DESC;";
 			$stmt = $pdo->prepare($sql);
 			$stmt->execute();
 
