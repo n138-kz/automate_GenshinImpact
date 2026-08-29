@@ -153,6 +153,7 @@ function insertDB($datalist=[]){
 			$stmt->execute([$valuedata, $newId]);
 		}
 	} catch (PDOException $e) {
+		error_log('Error has occured on '.__LINE__.', '.__FILE__);
 		error_log('PDO Error has occured: '.$e->getMessage());
 		return 'PDO Error has occured: '.$e->getMessage();
 	}
@@ -347,7 +348,7 @@ function main(){
 
 		echo $html_output;
 	}catch(\PDOException $e){
-		error_log("Error has occured on {__LINE__}, {__FILE__}");
+		error_log('Error has occured on '.__LINE__.', '.__FILE__);
 		error_log('PDO Error has occured: '.$e->getMessage());
 		return 'PDO Error has occured: '.$e->getMessage();
 	}
