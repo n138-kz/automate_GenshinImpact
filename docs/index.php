@@ -411,7 +411,10 @@ function main(){
 			$html_output .= '</body>';
 			$html_output .= '</html>';
 
-			echo $html_output;
+			if((bool)ini_get('display_errors')===false){
+				header('Content-Type: text/html;utf-8');
+				echo $html_output;
+			}
 		}catch(\PDOException $e){
 			error_log('Error has occured on '.__LINE__.', '.__FILE__);
 			error_log('PDO Error has occured: '.$e->getMessage());
