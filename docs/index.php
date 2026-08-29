@@ -80,86 +80,6 @@ function flatten_json($data, string $parent_key = ''): array {
 
 	return $items;
 }
-function insertDB_users_old($datalist=[], $rawjson){
-	$database_host = $_ENV['INTERNAL_DB_HOST'] ?? 'db';
-	$database_port = $_ENV['INTERNAL_DB_PORT'] ?? '5432';
-	$database_db   = $_ENV['INTERNAL_DB_DATABASE'] ?? 'myapp';
-	$database_user = $_ENV['INTERNAL_DB_USERNAME'] ?? 'postgres';
-	$database_pass = $_ENV['INTERNAL_DB_PASSWORD'] ?? 'password';
-	$database_conn = "pgsql:host={$database_host};port={$database_port};dbname={$database_db}";
-
-	if(!is_array($datalist)){
-		return 'arg "datalist" is not list.';
-	}
-
-	try {
-		$pdo = new PDO($database_conn, $database_user, $database_pass, [
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-		]);
-
-		/* * get id (RETURNING id を使うことで安全かつ確実に取得) */
-		$sql = 'INSERT INTO users (rawjson) VALUES (?) RETURNING id;';
-		$stmt = $pdo->prepare($sql);
-		$stmt->execute([$rawjson]);
-		$newId = $stmt->fetchColumn();
-
-		for($i=0;$i<count($datalist);$i++){
-			$datalist[$i]=explode('=', $datalist[$i]);
-			$datalist[$i][0]=str_replace('.', '_', $datalist[$i][0]);
-		}
-
-		/* * not exist column then add column */
-		foreach ($datalist as $value) {
-			$table = 'users';
-			$column = strtolower($value[0]);
-			$valuedata = $value[1];
-
-			if($column===''){
-				continue;
-			}
-
-			$sql = 'SELECT COUNT(*)
-						FROM information_schema.columns
-						WHERE table_catalog = current_database()
-							AND table_schema = \'public\'
-							AND table_name = ?
-							AND column_name = ?';
-
-			$stmt = $pdo->prepare($sql);
-			$stmt->execute([$table, $column]);
-			$exists = (int)$stmt->fetchColumn() > 0;
-
-			if (!$exists) {
-				$datatype='TEXT';
-				$datatype=is_int($valuedata)?'INT':$datatype;
-				$datatype=is_float($valuedata)?'DOUBLE PRECISION':$datatype; // PostgresはDOUBLEではなくDOUBLE PRECISION
-				$sql = "ALTER TABLE \"{$table}\" ADD COLUMN \"{$column}\" {$datatype} DEFAULT NULL;";
-				$stmt = $pdo->prepare($sql);
-				$stmt->execute();
-			}
-		}
-
-		/* * update data */
-		foreach($datalist as $value){
-			$column = strtolower($value[0]);
-			$valuedata = $value[1];
-
-			if($column===''){
-				continue;
-			}
-
-			$sql = "UPDATE \"users\" SET \"{$column}\" = ? WHERE id = ?;";
-			$stmt = $pdo->prepare($sql);
-			$stmt->execute([$valuedata, $newId]);
-		}
-	} catch (PDOException $e) {
-		error_log('Error has occured on '.__LINE__.', '.__FILE__);
-		error_log('PDO Error has occured: '.$e->getMessage());
-		return 'PDO Error has occured: '.$e->getMessage();
-	}
-
-	return NULL;
-}
 function insertDB_genshin_status_log($datalist=[]){
 	$database['host'] = $_ENV['INTERNAL_DB_HOST'] ?? 'db';
 	$database['port'] = $_ENV['INTERNAL_DB_PORT'] ?? '5432';
@@ -455,27 +375,10 @@ function main(){
 		return 'PDO Error has occured: '.$e->getMessage();
 	}
 	}else{
-		// 1. レスポンスを出力
 		if((bool)ini_get('display_errors')===false){
 			header('Content-Type: application/json');
 			echo json_encode($result, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT).PHP_EOL;
 		}
-	}
-
-	// 2. ブラウザ・クライアントへ即座にレスポンスを返し接続を切断する
-	if (function_exists('fastcgi_finish_request')) {
-		fastcgi_finish_request();
-	} else {
-		// CLIやFastCGI以外の環境用のフラッシュ処理
-		if (ob_get_level() > 0) {
-			ob_end_flush();
-		}
-		flush();
-	}
-
-	// 3. 接続切断後にバックグラウンドでDB処理を実行
-	foreach ($dbDataQueue as $flatData) {
-		insertDB_users_old($flatData, json_encode($item));
 	}
 }
 
