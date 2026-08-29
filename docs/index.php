@@ -297,7 +297,6 @@ function main(){
       $stmt = $pdo->prepare($sql);
       $stmt->execute();
 
-      $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
       $html_output = '';
       $html_output .= '';
       $html_output .= '<!DOCTYPE html>';
@@ -333,6 +332,20 @@ function main(){
       $html_output .= '<th>current_resin_percent</th>';
       $html_output .= '<th>resin_recovery_time</th>';
       $html_output .= '</tr>';
+      foreach($result as $r_k1 => $r_v1){
+        $html_output .= '<tr>';
+        $html_output .= '<td>latest</td>';
+        $html_output .= '<td>'.$r_v1['enka']['playerInfo']['nickname'].'</td>';
+        $html_output .= '<td>'.$r_v1['enka']['playerInfo']['signature'].'</td>';
+        $html_output .= '<td><a href="https://enka.network/u/'.$r_v1['enka']['uid'].'" target="enka.network.u.'.$r_v1['enka']['uid'].'">'.$r_v1['enka']['uid'].'</a></td>';
+        $html_output .= '<td>'.$r_v1['hoyolab']['current_resin'].'</td>';
+        $html_output .= '<td>'.$r_v1['hoyolab']['max_resin'].'</td>';
+        $html_output .= '<td>'.($r_v1['hoyolab']['current_resin']/$r_v1['hoyolab']['max_resin']*100).'%</td>';
+        $html_output .= '<td>'.$r_v1['hoyolab']['resin_recovery_time'].'</td>';
+        $html_output .= '</tr>';
+      }
+
+      $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
       foreach($result as $r_k1 => $r_v1){
         $html_output .= '<tr>';
         $html_output .= '<td>'.$r_v1['updated_at'].'</td>';
