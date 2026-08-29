@@ -137,6 +137,65 @@ function insertDB_discord_webhooks_log($datalist=[]){
 	}
 	return NULL;
 }
+class TooManyRequestException extends Exception {}
+function delete_posted_messages(){
+	$database['host'] = $_ENV['INTERNAL_DB_HOST'] ?? 'db';
+	$database['port'] = $_ENV['INTERNAL_DB_PORT'] ?? '5432';
+	$database['db']   = $_ENV['INTERNAL_DB_DATABASE'] ?? 'myapp';
+	$database['user'] = $_ENV['INTERNAL_DB_USERNAME'] ?? 'postgres';
+	$database['pass'] = $_ENV['INTERNAL_DB_PASSWORD'] ?? 'password';
+	$database['conn'] = "pgsql:host={$database['host']};port={$database['port']};dbname={$database['db']}";
+	$database['activetable'] = 'discord_webhooks_log';
+
+	try {
+		$pdo = new PDO($database['conn'], $database['user'], $database['pass'], [
+			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+		]);
+
+		$pdo->beginTransaction();
+		$beginTransactionAt = time();
+
+		$sql = "SELECT INDEX, UPDATED_AT, WEBHOOKID, WEBHOOKURL FROM DISCORD_WEBHOOKS_LOG_VIEW WHERE WEBHOOKID IS NOT NULL AND DELETED = FALSE;";
+		$stmt = $pdo->prepare($sql);
+		$stmt->execute();
+
+		$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		foreach($result as $v){
+			$ch = curl_init($v['webhookurl']);
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, [
+				'Content-Type: application/json',
+			]);
+			$response = [
+				'body' => curl_exec($ch),
+				'curl_header' => curl_getinfo($ch),
+			];
+			if(($response['curl_header']['http_code']===204)||$response['curl_header']['http_code']===404){
+				error_log("[{$beginTransactionAt}]HTTP DELETE {$v['webhookurl']} {$response['curl_header']['http_code']}");
+				$sql = "UPDATE discord_webhooks_log SET DELETED = TRUE WHERE (rawjson->>'id') = ?;";
+				$stmt = $pdo->prepare($sql);
+				$stmt->execute([$v['webhookid']]);
+			}elseif($response['curl_header']['http_code']===429) {
+				throw new TooManyRequestException("[{$beginTransactionAt}]HTTP DELETE {$v['webhookurl']} {$response['curl_header']['http_code']}");
+			}
+			sleep(1);
+		}
+
+		$pdo->commit();
+	} catch (TooManyRequestException $e) {
+		$pdo->rollback();
+		error_log('Error has occured on '.__LINE__.', '.__FILE__);
+		error_log('TooManyRequestException Error has occured: '.$e->getMessage());
+		return 'TooManyRequestException Error has occured: '.$e->getMessage();
+	} catch (PDOException $e) {
+		$pdo->rollback();
+		error_log('Error has occured on '.__LINE__.', '.__FILE__);
+		error_log('PDO Error has occured: '.$e->getMessage());
+		return 'PDO Error has occured: '.$e->getMessage();
+	}
+	return NULL;
+}
 function main(){
 	$document_root='http://172.21.83.191:8088/?get=history';
 	$config_file='/app'.'/users.json';
@@ -162,6 +221,8 @@ function main(){
 		if($hoyolab['retcode']===0 && isset($hoyolab['data'])){
 			$hoyolab=$hoyolab['data'];
 		}
+
+		delete_posted_messages();
 
 		/* * Notice to Discord * */
 		if(isset($v['discord']['webhook']['url'])&&$v['discord']['webhook']['url']!==''){
