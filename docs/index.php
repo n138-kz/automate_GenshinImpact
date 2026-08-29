@@ -300,7 +300,7 @@ function main(){
 
 	/* * Notice to Discord * */
 	{
-		$payload_json = json_encode($discord_notifies_payload_data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+		$payload_json = json_encode($discord_notifies_payload_data);
 		if(mb_strlen($payload_json)<=2000) {
 			$ch = curl_init($v['discord']['webhook']['url'].'?wait=true');
 			curl_setopt($ch, CURLOPT_POST, true);
@@ -314,7 +314,7 @@ function main(){
 				'rawjson' => json_encode($curl_result),
 			]);
 		}else{
-			error_log('DISCORD push content has over 2k length');
+			error_log('DISCORD push content has over 2k length: '.mb_strlen($payload_json));
 		}
 	}
 
