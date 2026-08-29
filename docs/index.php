@@ -160,6 +160,47 @@ function insertDB($datalist=[]){
 
 	return NULL;
 }
+function insertDB_discord_webhooks_log($datalist=[]){
+	$database['host'] = $_ENV['INTERNAL_DB_HOST'] ?? 'db';
+	$database['port'] = $_ENV['INTERNAL_DB_PORT'] ?? '5432';
+	$database['db']   = $_ENV['INTERNAL_DB_DATABASE'] ?? 'myapp';
+	$database['user'] = $_ENV['INTERNAL_DB_USERNAME'] ?? 'postgres';
+	$database['pass'] = $_ENV['INTERNAL_DB_PASSWORD'] ?? 'password';
+	$database['conn'] = "pgsql:host={$database['host']};port={$database['port']};dbname={$database['db']}";
+	$database['activetable'] = 'discord_webhooks_log';
+
+	if(!is_array($datalist)){
+		$e='arg "datalist" is not list.';
+		error_log('Error has occured on '.__LINE__.', '.__FILE__);
+		error_log('Data Error: '.$e);
+		return $e;
+	}
+	if(!isset($datalist['rawjson'])){
+		$e='arg "datalist" key rawjson is null.';
+		error_log('Error has occured on '.__LINE__.', '.__FILE__);
+		error_log('Data Error: '.$e);
+		return $e;
+	}
+
+	try {
+		$pdo = new PDO($database['conn'], $database['user'], $database['pass'], [
+			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+		]);
+
+		$pdo->beginTransaction();
+
+		$sql = "INSERT INTO {$database['activetable']} (rawjson) VALUES (?);";
+		$stmt = $pdo->prepare($sql);
+		$stmt->execute([$datalist['rawjson']]);
+		$pdo->commit();
+	} catch (PDOException $e) {
+		$pdo->rollback();
+		error_log('Error has occured on '.__LINE__.', '.__FILE__);
+		error_log('PDO Error has occured: '.$e->getMessage());
+		return 'PDO Error has occured: '.$e->getMessage();
+	}
+	return NULL;
+}
 
 function main(){
 	$config_file='/app'.'/users.json';
@@ -269,6 +310,9 @@ function main(){
 				'Content-Type: application/json',
 			]);
 			$curl_result = json_decode(curl_exec($ch), true);
+			insertDB_discord_webhooks_log([
+				'rawjson' => json_encode($curl_result),
+			]);
 		}else{
 			error_log('DISCORD push content has over 2k length');
 		}
