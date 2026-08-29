@@ -7,7 +7,6 @@ BEGIN
 END;
 $$ language 'plpgsql';
 -- TABLE
-DROP VIEW IF EXISTS discord_webhooks_log_view;
 DROP TABLE IF EXISTS discord_webhooks_log;
 CREATE TABLE discord_webhooks_log (
     id SERIAL PRIMARY KEY,
@@ -22,6 +21,7 @@ CREATE OR REPLACE TRIGGER update_discord_webhooks_log_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 -- VIEW
+DROP VIEW IF EXISTS discord_webhooks_log_view;
 CREATE OR REPLACE VIEW discord_webhooks_log_view AS
     SELECT
         id index,
@@ -29,6 +29,8 @@ CREATE OR REPLACE VIEW discord_webhooks_log_view AS
             UPDATED_AT AT TIME ZONE 'Asia/Tokyo',
             'FMMM/DD FMHH24:MI:SS'
         ) AS updated_at,
-        rawjson->>'id' webhookid
+        rawjson->>'id' webhookid,
+        rawjson->>'url' webhookurl,
+        deleted
     FROM
         discord_webhooks_log;
