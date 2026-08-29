@@ -197,7 +197,7 @@ function delete_posted_messages(){
 	return NULL;
 }
 function main(){
-	$document_root='http://172.21.83.191:8088/?get=history';
+	$document_root='http://172.21.83.191:8089/?get=history';
 	$config_file='/app'.'/users.json';
 
 	if(!file_exists($config_file)){
