@@ -366,6 +366,7 @@ function main(){
 			$html_output .= '<body>';
 			$html_output .= '<table border="1">';
 			$html_output .= '<tr>';
+			$html_output .= '<td>#</td>';
 			$html_output .= '<th>updated_at</th>';
 			$html_output .= '<th>player_name</th>';
 			$html_output .= '<th>player_signature</th>';
@@ -377,6 +378,7 @@ function main(){
 			$html_output .= '</tr>';
 			foreach($result as $r_k1 => $r_v1){
 				$html_output .= '<tr>';
+				$html_output .= '<td>#</td>';
 				$html_output .= '<td>latest</td>';
 				$html_output .= '<td>'.$r_v1['enka']['playerInfo']['nickname'].'</td>';
 				$html_output .= '<td>'.$r_v1['enka']['playerInfo']['signature'].'</td>';
@@ -387,10 +389,14 @@ function main(){
 				$html_output .= '<td>' . (new DateTimeImmutable('now', new DateTimeZone('Asia/Tokyo')))->modify('+' . (int)$r_v1['hoyolab']['resin_recovery_time'] . ' seconds')->format('n/d H:i:s') . '</td>';
 				$html_output .= '</tr>';
 			}
+			$html_output .= '<tr>';
+			$html_output .= '<td colspan="9"></td>';
+			$html_output .= '</tr>';
 
 			$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			foreach($result as $r_k1 => $r_v1){
 				$html_output .= '<tr>';
+				$html_output .= '<td>'.($r_k1+1).'</td>';
 				$html_output .= '<td>'.(new DateTimeImmutable($r_v1['updated_at']))->setTimezone(new DateTimeZone('Asia/Tokyo'))->format('n/d H:i:s').'</td>';
 				$html_output .= "<td>{$r_v1['nickname']}</td>";
 				$html_output .= "<td>{$r_v1['signature']}</td>";
