@@ -9,14 +9,7 @@ $$ language 'plpgsql';
 -- TABLE
 DROP VIEW IF EXISTS users_view;
 DROP TABLE IF EXISTS users;
-DROP VIEW IF EXISTS discord_webhooks_log_view;
-DROP TABLE IF EXISTS discord_webhooks_log;
 CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-CREATE TABLE discord_webhooks_log (
     id SERIAL PRIMARY KEY,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -35,14 +28,6 @@ CREATE OR REPLACE VIEW users_view AS
         u.updated_at
     FROM
         users u
-CREATE OR REPLACE VIEW discord_webhooks_log_view AS
-    SELECT
-        d.id index,
-        d.created_at,
-        d.updated_at,
-        d.rawjson->'id' webhookid
-    FROM
-        discord_webhooks_log d;
 -- BEGIN;
 -- DROP VIEW IF EXISTS USERS_CURRENT_RESIN_LOG_VIEW;
 --
