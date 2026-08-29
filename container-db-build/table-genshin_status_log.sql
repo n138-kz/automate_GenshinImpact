@@ -48,3 +48,23 @@ CREATE OR REPLACE VIEW genshin_status_log_view AS
         ) AS RESIN_RECOVERY_TIME
     FROM
         genshin_status_log;
+DROP VIEW IF EXISTS genshin_status_log_view_php;
+CREATE OR REPLACE VIEW genshin_status_log_view_php AS
+    SELECT
+        id AS index,
+        updated_at,
+        rawjson->'enka'->>'uid' AS uid,
+        rawjson->'enka'->'playerInfo'->>'nickname' AS nickname,
+        rawjson->'enka'->'playerInfo'->>'signature' AS signature,
+        rawjson->'hoyolab'->>'current_resin' AS CURRENT_RESIN,
+        rawjson->'hoyolab'->>'max_resin' AS MAX_RESIN,
+        RTRIM(
+            TO_CHAR(
+                ((rawjson->'hoyolab'->>'current_resin')::NUMERIC / (rawjson->'hoyolab'->>'max_resin')::NUMERIC * 100),
+                'FM990.99'
+            ),
+            '.'
+        ) || '%' AS CURRENT_RESIN_PERCENT,
+        NOW() + ((rawjson->'hoyolab'->>'resin_recovery_time')::BIGINT * '1 second'::INTERVAL) AS FULL_RECOVERY_AT
+    FROM
+        genshin_status_log;
