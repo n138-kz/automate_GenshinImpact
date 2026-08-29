@@ -7,7 +7,6 @@ BEGIN
 END;
 $$ language 'plpgsql';
 -- TABLE
-DROP VIEW IF EXISTS genshin_status_log_view;
 DROP TABLE IF EXISTS genshin_status_log;
 CREATE TABLE genshin_status_log (
     id SERIAL PRIMARY KEY,
@@ -22,13 +21,14 @@ CREATE OR REPLACE TRIGGER update_genshin_status_log_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 -- VIEW
+DROP VIEW IF EXISTS genshin_status_log_view;
 CREATE OR REPLACE VIEW genshin_status_log_view AS
     SELECT
         id AS index,
         TO_CHAR(
             UPDATED_AT AT TIME ZONE 'Asia/Tokyo',
             'FMMM/DD FMHH24:MI:SS'
-        ) AS updated_at,
+        ) AS updated_at_h,
         rawjson->'enka'->>'uid' AS uid,
         rawjson->'enka'->'playerInfo'->>'nickname' AS nickname,
         rawjson->'enka'->'playerInfo'->>'signature' AS signature,
