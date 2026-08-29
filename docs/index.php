@@ -192,6 +192,7 @@ function main(){
         $embed = [];
         $embed['color'] = hexdec('FFA500');
         $embed['timestamp'] = (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('Y-m-d\TH:i:s.v\Z');
+        $embed['title'] = "{$enka['playerInfo']['nickname']}({$v['genshin']['uid']})の樹脂が溢れそう";
         $embed['description'] = "{$hoyolab['current_resin']}/{$hoyolab['max_resin']}";
         $fields = [];
         $field = [];
