@@ -89,7 +89,7 @@ function insertDB($datalist=[]){
     $database_conn = "pgsql:host={$database_host};port={$database_port};dbname={$database_db}";
 
     if(!is_array($datalist)){
-      return 'arg "datalist" is not list.';
+        return 'arg "datalist" is not list.';
     }
 
     try {
