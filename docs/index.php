@@ -227,7 +227,7 @@ function main(){
 
 		/* * Notice to Discord * */
 		if(isset($v['discord']['webhook']['url'])&&$v['discord']['webhook']['url']!==''){
-			if($hoyolab['current_resin']<$hoyolab['max_resin'] && $hoyolab['current_resin']/$hoyolab['max_resin']>=0.95){
+			if($hoyolab['current_resin']<$hoyolab['max_resin'] && $hoyolab['current_resin']/$hoyolab['max_resin']>=0.9){
 				$embed = [];
 				$embed['color'] = hexdec('FFA500');
 				$embed['timestamp'] = (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('Y-m-d\TH:i:s.v\Z');
