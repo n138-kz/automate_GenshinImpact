@@ -24,9 +24,11 @@ CREATE OR REPLACE TRIGGER update_discord_webhooks_log_updated_at
 -- VIEW
 CREATE OR REPLACE VIEW discord_webhooks_log_view AS
     SELECT
-        d.id index,
-        d.created_at,
-        d.updated_at,
-        d.rawjson->'id' webhookid
+        id index,
+        TO_CHAR(
+            UPDATED_AT AT TIME ZONE 'Asia/Tokyo',
+            'FMMM/DD FMHH24:MI:SS'
+        ) AS updated_at,
+        rawjson->>'id' webhookid
     FROM
-        discord_webhooks_log d;
+        discord_webhooks_log;
