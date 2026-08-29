@@ -335,7 +335,7 @@ function main(){
 			$pdo = new PDO($database_conn, $database_user, $database_pass, [
 				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
 			]);
-			$sql = 'SELECT * FROM USERS_CURRENT_RESIN_LOG_VIEW LIMIT 2000;';
+			$sql = "SELECT * FROM GENSHIN_STATUS_LOG_VIEW_PHP WHERE UPDATED_AT >= NOW() - INTERVAL '1 day';";
 			$stmt = $pdo->prepare($sql);
 			$stmt->execute();
 
