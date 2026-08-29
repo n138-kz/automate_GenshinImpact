@@ -403,7 +403,7 @@ function main(){
 				$html_output .= "<td><a href=\"https://enka.network/u/{$r_v1['uid']}\" target=\"enka.network.u.{$r_v1['uid']}\">{$r_v1['uid']}</a></td>";
 				$html_output .= "<td>{$r_v1['current_resin']}</td>";
 				$html_output .= "<td>{$r_v1['max_resin']}</td>";
-				$html_output .= "<td>{$r_v1['current_resin_percent']}</td>";
+				$html_output .= '<td>'.$r_v1['current_resin_percent'].'</td>';
 				$html_output .= '<td>'.(new DateTimeImmutable($r_v1['full_recovery_at']))->setTimezone(new DateTimeZone('Asia/Tokyo'))->format('n/d H:i:s').'</td>';
 				$html_output .= '</tr>';
 			}
