@@ -55,31 +55,6 @@ function fetch_hoyolab_daily_note(int $uid, array $cookies): ?array {
 
 	return $res ? json_decode($res, true) : null;
 }
-function flatten_json($data, string $parent_key = ''): array {
-	$items = [];
-
-	// 連想配列（連想キーを持つ配列）の判定
-	if (is_array($data) && (empty($data) || array_keys($data) !== range(0, count($data) - 1))) {
-		foreach ($data as $k => $v) {
-			$new_key = $parent_key !== '' ? "{$parent_key}.{$k}" : $k;
-			$items = array_merge($items, flatten_json($v, $new_key));
-		}
-	}
-	// インデックス配列（リスト）の判定
-	elseif (is_array($data)) {
-		foreach ($data as $item) {
-			$items = array_merge($items, flatten_json($item, $parent_key));
-		}
-	}
-	// スカラー値（文字列、数値、真偽値など）
-	else {
-		// nullやbooleanなどの出力調整が必要な場合はここでハンドリング
-		$val_str = is_bool($data) ? ($data ? 'True' : 'False') : (string)$data;
-		$items[] = "{$parent_key}={$val_str}";
-	}
-
-	return $items;
-}
 function insertDB_genshin_status_log($datalist=[]){
 	$database['host'] = $_ENV['INTERNAL_DB_HOST'] ?? 'db';
 	$database['port'] = $_ENV['INTERNAL_DB_PORT'] ?? '5432';
@@ -174,7 +149,6 @@ function main(){
 	$config_data=json_decode($config_data, TRUE);
 
 	$result=[];
-	$dbDataQueue = []; // バックグラウンド処理用にデータを一時保存
 
 	$discord_notifies_payload_data = [
 		'content' => null,
@@ -262,7 +236,6 @@ function main(){
 		]);
 
 		array_push($result, $item);
-		$dbDataQueue[] = flatten_json($item);
 	}
 
 	/* * Notice to Discord * */
