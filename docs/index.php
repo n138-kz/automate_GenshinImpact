@@ -80,7 +80,7 @@ function flatten_json($data, string $parent_key = ''): array {
 
 	return $items;
 }
-function insertDB_users($datalist=[]){
+function insertDB_users($datalist=[], $rawjson){
 	$database_host = $_ENV['INTERNAL_DB_HOST'] ?? 'db';
 	$database_port = $_ENV['INTERNAL_DB_PORT'] ?? '5432';
 	$database_db   = $_ENV['INTERNAL_DB_DATABASE'] ?? 'myapp';
@@ -98,9 +98,9 @@ function insertDB_users($datalist=[]){
 		]);
 
 		/* * get id (RETURNING id を使うことで安全かつ確実に取得) */
-		$sql = 'INSERT INTO users (updated_at) VALUES (CURRENT_TIMESTAMP) RETURNING id;';
+		$sql = 'INSERT INTO users (rawjson) VALUES (?) RETURNING id;';
 		$stmt = $pdo->prepare($sql);
-		$stmt->execute();
+		$stmt->execute([$rawjson]);
 		$newId = $stmt->fetchColumn();
 
 		for($i=0;$i<count($datalist);$i++){
@@ -428,7 +428,7 @@ function main(){
 
 	// 3. 接続切断後にバックグラウンドでDB処理を実行
 	foreach ($dbDataQueue as $flatData) {
-		insertDB_users($flatData);
+		insertDB_users($flatData, json_encode($item));
 	}
 }
 
