@@ -383,21 +383,21 @@ function main(){
 				$html_output .= '<td>'.$r_v1['hoyolab']['current_resin'].'</td>';
 				$html_output .= '<td>'.$r_v1['hoyolab']['max_resin'].'</td>';
 				$html_output .= '<td>'.($r_v1['hoyolab']['current_resin']/$r_v1['hoyolab']['max_resin']*100).'%</td>';
-				$html_output .= '<td>'.$r_v1['hoyolab']['resin_recovery_time'].'</td>';
+				$html_output .= '<td>' . (new DateTimeImmutable('now', new DateTimeZone('Asia/Tokyo')))->modify('+' . (int)$r_v1['hoyolab']['resin_recovery_time'] . ' seconds')->format('n/d H:i:s') . '</td>';
 				$html_output .= '</tr>';
 			}
 
 			$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			foreach($result as $r_k1 => $r_v1){
 				$html_output .= '<tr>';
-				$html_output .= '<td>'.$r_v1['updated_at'].'</td>';
-				$html_output .= '<td>'.$r_v1['player_name'].'</td>';
-				$html_output .= '<td>'.$r_v1['player_signature'].'</td>';
-				$html_output .= '<td><a href="https://enka.network/u/'.$r_v1['enka_uid'].'" target="enka.network.u.'.$r_v1['enka_uid'].'">'.$r_v1['enka_uid'].'</a></td>';
-				$html_output .= '<td>'.$r_v1['current_resin'].'</td>';
-				$html_output .= '<td>'.$r_v1['max_resin'].'</td>';
-				$html_output .= '<td>'.$r_v1['current_resin_percent'].'</td>';
-				$html_output .= '<td>'.$r_v1['resin_recovery_time'].'</td>';
+				$html_output .= '<td>'.(new DateTimeImmutable($r_v1['updated_at']))->setTimezone(new DateTimeZone('Asia/Tokyo'))->format('n/d H:i:s').'</td>';
+				$html_output .= "<td>{$r_v1['nickname']}</td>";
+				$html_output .= "<td>{$r_v1['signature']}</td>";
+				$html_output .= "<td><a href=\"https://enka.network/u/{$r_v1['uid']}\" target=\"enka.network.u.{$r_v1['uid']}\">{$r_v1['uid']}</a></td>";
+				$html_output .= "<td>{$r_v1['current_resin']}</td>";
+				$html_output .= "<td>{$r_v1['max_resin']}</td>";
+				$html_output .= "<td>{$r_v1['current_resin_percent']}</td>";
+				$html_output .= '<td>'.(new DateTimeImmutable($r_v1['full_recovery_at']))->setTimezone(new DateTimeZone('Asia/Tokyo'))->format('n/d H:i:s').'</td>';
 				$html_output .= '</tr>';
 			}
 			$html_output .= '</table>';
