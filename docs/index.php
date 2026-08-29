@@ -268,11 +268,7 @@ function main(){
 			curl_setopt($ch, CURLOPT_HTTPHEADER, [
 				'Content-Type: application/json',
 			]);
-			if(count($discord_notifies_payload_data['embeds'])>0){
-				error_log($payload_json);
-				$curl_result = json_decode(curl_exec($ch), true);
-				error_log(json_encode($curl_result));
-			}
+			$curl_result = json_decode(curl_exec($ch), true);
 		}else{
 			error_log('DISCORD push content has over 2k length');
 		}
