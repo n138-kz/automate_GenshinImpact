@@ -161,6 +161,7 @@ function insertDB($datalist=[]){
 }
 
 function main(){
+  $document_root='http://172.21.83.191:8088/?get=history';
   $config_file='/app'.'/users.json';
 
   if(!file_exists($config_file)){
