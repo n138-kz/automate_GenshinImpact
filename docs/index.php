@@ -80,7 +80,7 @@ function flatten_json($data, string $parent_key = ''): array {
 
 	return $items;
 }
-function insertDB_users($datalist=[], $rawjson){
+function insertDB_users_old($datalist=[], $rawjson){
 	$database_host = $_ENV['INTERNAL_DB_HOST'] ?? 'db';
 	$database_port = $_ENV['INTERNAL_DB_PORT'] ?? '5432';
 	$database_db   = $_ENV['INTERNAL_DB_DATABASE'] ?? 'myapp';
@@ -430,7 +430,7 @@ function main(){
 
 	// 3. 接続切断後にバックグラウンドでDB処理を実行
 	foreach ($dbDataQueue as $flatData) {
-		insertDB_users($flatData, json_encode($item));
+		insertDB_users_old($flatData, json_encode($item));
 	}
 }
 
