@@ -276,6 +276,7 @@ function main(){
         error_log(json_encode($curl_result));
       }
     }else{
+      error_log($payload_json);
       error_log('DISCORD push content has over 2k length');
     }
   }
