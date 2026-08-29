@@ -350,8 +350,10 @@ function main(){
 	}
 	}else{
 		// 1. レスポンスを出力
-		header('Content-Type: application/json');
-		echo json_encode($result, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT).PHP_EOL;
+		if((bool)ini_get('display_errors')===false){
+			header('Content-Type: application/json');
+			echo json_encode($result, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT).PHP_EOL;
+		}
 	}
 
 	// 2. ブラウザ・クライアントへ即座にレスポンスを返し接続を切断する
