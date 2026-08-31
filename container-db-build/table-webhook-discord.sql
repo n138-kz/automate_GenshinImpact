@@ -25,10 +25,7 @@ DROP VIEW IF EXISTS discord_webhooks_log_view;
 CREATE OR REPLACE VIEW discord_webhooks_log_view AS
     SELECT
         id index,
-        TO_CHAR(
-            UPDATED_AT AT TIME ZONE 'Asia/Tokyo',
-            'FMMM/DD FMHH24:MI:SS'
-        ) AS updated_at,
+        updated_at,
         rawjson->>'id' webhookid,
         rawjson->>'url' webhookurl,
         deleted
