@@ -363,7 +363,7 @@ function main(){
 				$html_output .= '<td><a href="https://enka.network/u/'.$r_v1['enka']['uid'].'" target="enka.network.u.'.$r_v1['enka']['uid'].'">'.$r_v1['enka']['uid'].'</a></td>';
 				$html_output .= '<td>'.$r_v1['hoyolab']['current_resin'].'</td>';
 				$html_output .= '<td>'.$r_v1['hoyolab']['max_resin'].'</td>';
-				$html_output .= '<td>'.($r_v1['hoyolab']['current_resin']/$r_v1['hoyolab']['max_resin']*100).'%</td>';
+				$html_output .= '<td><progress value="'.($r_v1['hoyolab']['current_resin']/$r_v1['hoyolab']['max_resin']).'"></progress>'.($r_v1['hoyolab']['current_resin']/$r_v1['hoyolab']['max_resin']*100).'%</td>';
 				$html_output .= '<td>' . (new DateTimeImmutable('now', new DateTimeZone('Asia/Tokyo')))->modify('+' . (int)$r_v1['hoyolab']['resin_recovery_time'] . ' seconds')->format('n/d H:i:s') . '</td>';
 				$html_output .= '</tr>';
 			}
