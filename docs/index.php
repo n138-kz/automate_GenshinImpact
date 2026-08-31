@@ -395,6 +395,36 @@ function main(){
 			$html_output .= '<script src="https://accounts.google.com/gsi/client" async defer></script>';
 			$html_output .= '<script src="https://www.google.com/recaptcha/api.js?render=6LfCHdcUAAAAAOwkHsW_7W7MfoOrvoIw9CXdLRBA"></script>';
 			$html_output .= '<script src="https://n138-kz.github.io/lib/grecaptcha.js"></script>';
+			$html_output .= '<style>';
+			$html_output .= '/* CSS */';
+			$html_output .= 'progress {';
+			$html_output .= '  /* ブラウザ標準のデザインをリセット */';
+			$html_output .= '  -webkit-appearance: none;';
+			$html_output .= '  appearance: none;';
+			$html_output .= '  height: 20px;';
+			$html_output .= '}';
+			$html_output .= '/* 背景色（トラック部分） */';
+			$html_output .= 'progress::-webkit-progress-bar {';
+			$html_output .= '  background-color: #eee;';
+			$html_output .= '  border-radius: 4px;';
+			$html_output .= '}';
+			$html_output .= '';
+			$html_output .= '/* デフォルトのバーの色（例: 青） */';
+			$html_output .= 'progress::-webkit-progress-value {';
+			$html_output .= '  background-color: #007bff;';
+			$html_output .= '  border-radius: 4px;';
+			$html_output .= '  transition: background-color 0.3s ease;';
+			$html_output .= '}';
+			$html_output .= '';
+			$html_output .= '/* 条件ごとの色変更 */';
+			$html_output .= 'progress[data-status="warning"]::-webkit-progress-value {';
+			$html_output .= '  background-color: orange; /* 0.8超〜0.9以下: 黄色 */';
+			$html_output .= '}';
+			$html_output .= '';
+			$html_output .= 'progress[data-status="danger"]::-webkit-progress-value {';
+			$html_output .= '  background-color: red; /* 0.9超: 赤色 */';
+			$html_output .= '}';
+			$html_output .= '</style>';
 			$html_output .= '</head>';
 			$html_output .= '<body>';
 			$html_output .= '<table border="1">';
@@ -418,7 +448,16 @@ function main(){
 				$html_output .= '<td><a href="https://enka.network/u/'.$r_v1['enka']['uid'].'" target="enka.network.u.'.$r_v1['enka']['uid'].'">'.$r_v1['enka']['uid'].'</a></td>';
 				$html_output .= '<td>'.$r_v1['hoyolab']['current_resin'].'</td>';
 				$html_output .= '<td>'.$r_v1['hoyolab']['max_resin'].'</td>';
-				$html_output .= '<td><progress value="'.($r_v1['hoyolab']['current_resin']/$r_v1['hoyolab']['max_resin']).'"></progress>'.($r_v1['hoyolab']['current_resin']/$r_v1['hoyolab']['max_resin']*100).'%</td>';
+				$progress = $r_v1['hoyolab']['current_resin']/$r_v1['hoyolab']['max_resin'];
+				if(false){
+				}elseif($progress>=0.9){
+					$progress='danger';
+				}elseif($progress>=0.8){
+					$progress='warning';
+				}else{
+					$progress='';
+				}
+				$html_output .= '<td><progress data-status="'.$progress.'" value="'.($r_v1['hoyolab']['current_resin']/$r_v1['hoyolab']['max_resin']).'"></progress>'.($r_v1['hoyolab']['current_resin']/$r_v1['hoyolab']['max_resin']*100).'%</td>';
 				$html_output .= '<td>' . (new DateTimeImmutable('now', new DateTimeZone('Asia/Tokyo')))->modify('+' . (int)$r_v1['hoyolab']['resin_recovery_time'] . ' seconds')->format('n/d H:i:s') . '</td>';
 				$html_output .= '</tr>';
 			}
