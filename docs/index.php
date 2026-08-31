@@ -266,32 +266,10 @@ function main(){
 			}
 		}
 
-		if(FALSE){
-		}elseif(isset($_GET['get'])&&$_GET['get']==='latest'){
-			/* * latest value */
-			$item = [
-				'UPDATED_AT'=>(new DateTimeImmutable('now', new DateTimeZone('Asia/Tokyo')))->format('Y-m-d\TH:i:s.vP'),
-				'PLAYER_NAME'=>$enka['playerInfo']['nickname'],
-				'PLAYER_SIGNATURE'=>$enka['playerInfo']['signature'],
-				'ENKA_UID'=>$enka['uid'],
-				'CURRENT_RESIN'=>$hoyolab['current_resin'],
-				'MAX_RESIN'=>$hoyolab['max_resin'],
-				'CURRENT_RESIN_PERCENT'=>($hoyolab['current_resin']/$hoyolab['max_resin']*100),
-				'RESIN_RECOVERY_TIME'=>sprintf('%d:%02d:%02d',
-					floor((int)$hoyolab['resin_recovery_time']/3600),
-					floor(((int)$hoyolab['resin_recovery_time']%3600)/60),
-					(int)$hoyolab['resin_recovery_time']%60
-				),
-			];
-			if($item['CURRENT_RESIN']===$item['MAX_RESIN']){
-				unset($item['RESIN_RECOVERY_TIME']);
-			}
-		}else{
-			$item = [
-				'enka'=>$enka,
-				'hoyolab'=>$hoyolab,
-			];
-		}
+		$item = [
+			'enka'=>$enka,
+			'hoyolab'=>$hoyolab,
+		];
 
 		insertDB_genshin_status_log([
 			'rawjson' => json_encode($item),
