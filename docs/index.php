@@ -156,7 +156,7 @@ function delete_posted_messages(){
 		$pdo->beginTransaction();
 		$beginTransactionAt = time();
 
-		$sql = "SELECT INDEX, UPDATED_AT, WEBHOOKID, WEBHOOKURL FROM DISCORD_WEBHOOKS_LOG_VIEW WHERE WEBHOOKID IS NOT NULL AND DELETED = FALSE;";
+		$sql = "SELECT INDEX, UPDATED_AT, WEBHOOKID, WEBHOOKURL FROM DISCORD_WEBHOOKS_LOG_VIEW WHERE WEBHOOKID IS NOT NULL AND DELETED = FALSE OFFSET 1;";
 		$stmt = $pdo->prepare($sql);
 		$stmt->execute();
 
