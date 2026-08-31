@@ -197,8 +197,61 @@ function delete_posted_messages(){
 	}
 	return NULL;
 }
+function getContainerPublishPort($targetContainer = 'web'){
+	$socketPath = '/var/run/docker.sock';
+	if (!file_exists($socketPath)) {
+		error_log("Socket file does not exist: {$socketPath}");
+		return null;
+	}
+
+	// 取得したい対象のコンテナ名またはサービス名
+	// Docker Composeの場合は「プロジェクト名-サービス名-1」や「サービス名」で検索可能
+
+	$fp = @stream_socket_client("unix://{$socketPath}", $errno, $errstr, 5);
+	if (!$fp) {
+		error_log("Socket connect error: {$errstr} ({$errno})");
+		return null;
+	}
+
+	/* * Docker API (HTTP/1.1) リクエストを手動構築 * */
+	$out  = "GET /containers/{$targetContainer}/json HTTP/1.1\r\n";
+	$out .= "Host: localhost\r\n";
+	$out .= "Connection: Close\r\n\r\n";
+	fwrite($fp, $out);
+
+	/* * レスポンス全件を取得 * */
+	$response = '';
+	while (!feof($fp)) {
+		$response .= fgets($fp, 1024);
+	}
+	fclose($fp);
+
+	/* * HTTPヘッダーとレスポンスボディ（JSON）を分離 * */
+	$parts = explode("\r\n\r\n", $response, 2);
+	$headers = $parts[0] ?? '';
+	$body = $parts[1] ?? '';
+
+	$publishedPort=NULL;
+
+	if (strpos($headers, '200 OK') !== false && $body) {
+		/* * 転送符号化(Chunked)が含まれる場合があるため整形 * */
+		if (strpos($headers, 'Transfer-Encoding: chunked') !== false) {
+			$body = preg_replace('/^[0-9a-fA-F]+\r\n/', '', $body);
+			$body = preg_replace('/\r\n0\r\n\r\n$/', '', $body);
+		}
+
+		$data = json_decode(trim($body), true);
+		$publishedPort = $data['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'] ?? null;
+	} else {
+		$firstLine = strtok($headers, "\r\n");
+		error_log("Socket HTTP response error: {$firstLine}");
+	}
+
+	error_log("Web Container Published Port: " . $publishedPort);
+	return $publishedPort;
+}
 function main(){
-	$document_root='http://172.21.83.191:8089/?get=history';
+	$document_root='http://172.21.83.191:{port}/?get=history';
 	$config_file='/app'.'/users.json';
 
 	if(!file_exists($config_file)){
@@ -207,6 +260,8 @@ function main(){
 
 	$config_data=file_get_contents($config_file);
 	$config_data=json_decode($config_data, TRUE);
+
+	$document_root=str_replace('{port}', getContainerPublishPort('web'), $document_root);
 
 	$result=[];
 

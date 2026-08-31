@@ -1,6 +1,7 @@
 services:
   web:
     image: nginx:alpine
+    container_name: web
     restart: unless-stopped
     volumes:
       - ./docs:/var/www/html:ro
@@ -32,6 +33,7 @@ services:
     volumes:
       - ./container-app:/app:ro
       - ./docs:/var/www/html:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       GOOGLE_RECAPTCHA_SITE_KEY: "${GOOGLE_RECAPTCHA_SITE_KEY:-null}"
       GOOGLE_RECAPTCHA_SECRET_KEY: "${GOOGLE_RECAPTCHA_SECRET_KEY:-null}"
