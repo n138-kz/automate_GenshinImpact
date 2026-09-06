@@ -1,6 +1,7 @@
 <?php
 ini_set('display_errors', 0);
 ini_set('error_log', 'php://stderr');
+$processtime=['init'=>microtime(TRUE)];
 function fetch_enka_data(int $uid=0){
 	$options=[
 		'http' => [
@@ -251,6 +252,8 @@ function getContainerPublishPort($targetContainer = 'web'){
 	return $publishedPort;
 }
 function main(){
+	global $processtime;
+
 	$document_root='http://172.21.83.191:{port}/?get=history';
 	$config_file='/app'.'/users.json';
 
@@ -262,6 +265,17 @@ function main(){
 	$config_data=json_decode($config_data, TRUE);
 
 	$document_root=str_replace('{port}', getContainerPublishPort('web'), $document_root);
+
+	if(isset($_GET['get'])&&$_GET['get']==='health'){
+		$processtime['done']=microtime(TRUE);
+		header('Content-Type: application/json');
+		echo json_encode(['content'=>[
+			'urls'=>[
+				$document_root.'',
+			],
+		], 'header'=>['processtime'=>$processtime]], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES).PHP_EOL;
+		exit();
+	}
 
 	$result=[];
 
@@ -495,7 +509,8 @@ function main(){
 	}else{
 		if((bool)ini_get('display_errors')===false){
 			header('Content-Type: application/json');
-			echo json_encode($result, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT).PHP_EOL;
+			$processtime['done']=microtime(TRUE);
+			echo json_encode(['content'=>$result, 'header'=>['processtime'=>$processtime]], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES).PHP_EOL;
 		}
 	}
 }
