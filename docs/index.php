@@ -264,7 +264,7 @@ function main(){
 	$config_data=file_get_contents($config_file);
 	$config_data=json_decode($config_data, TRUE);
 
-	$document_root=str_replace('{port}', getContainerPublishPort('web'), $document_root);
+	$document_root=str_replace('{port}', getContainerPublishPort('genshin_automate_web')??80, $document_root);
 
 	if(isset($_GET['get'])&&$_GET['get']==='health'){
 		$processtime['done']=microtime(TRUE);
