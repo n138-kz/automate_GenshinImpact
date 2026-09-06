@@ -10,6 +10,10 @@ services:
       - app
     ports:
       - "8080-65535:80"
+    networks:
+      default:
+        aliases:
+          - web
   cron-web:
     container_name: genshin_automate_cron-web
     image: alpine
@@ -32,6 +36,10 @@ services:
       context: .
       dockerfile: ./container-app-build/Dockerfile
     restart: unless-stopped
+    networks:
+      default:
+        aliases:
+          - app
     volumes:
       - ./container-app:/app:ro
       - ./docs:/var/www/html:ro
