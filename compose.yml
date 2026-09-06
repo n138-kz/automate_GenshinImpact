@@ -1,7 +1,7 @@
 services:
   web:
     image: nginx:alpine
-    container_name: web
+    container_name: genshin_automate_web
     restart: unless-stopped
     volumes:
       - ./docs:/var/www/html:ro
@@ -11,6 +11,7 @@ services:
     ports:
       - "8080-65535:80"
   cron-web:
+    container_name: genshin_automate_cron-web
     image: alpine
     # curlをインストール後、whileループで60秒ごとにcurlを実行し続ける
     command: >
@@ -26,6 +27,7 @@ services:
     depends_on:
       - web
   app:
+    container_name: genshin_automate_app
     build:
       context: .
       dockerfile: ./container-app-build/Dockerfile
@@ -40,6 +42,7 @@ services:
       IPINFO_TOKEN: "${IPINFO_TOKEN:-null}"
       DISCORD_WEBHOOK_URL: "${DISCORD_WEBHOOK_URL:-null}"
   db:
+    container_name: genshin_automate_db
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
@@ -54,6 +57,7 @@ services:
         aliases:
           - database
   db_admin:
+    container_name: genshin_automate_db_admin
     image: dpage/pgadmin4:latest
     restart: no
     ports:
