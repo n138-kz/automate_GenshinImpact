@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-Control" content="no-cache">
+	<meta http-equiv="Expires" content="0">
+	<link rel="preconnect dns-prefetch" href="//github.com">
+	<link rel="preconnect dns-prefetch" href="//n138-kz.github.io">
+	<link rel="preconnect dns-prefetch" href="//code.jquery.com">
+	<link rel="preconnect dns-prefetch" href="//accounts.google.com">
+	<link rel="preconnect dns-prefetch" href="//www.google.com">
+	<link rel="stylesheet" type="text/css" href="https://n138-kz.github.io/lib/master.css?t=0" />
+	<script src="https://n138-kz.github.io/lib/master.js"></script>
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+	<script src="https://accounts.google.com/gsi/client" async defer></script>
+	<script src="https://www.google.com/recaptcha/api.js?render=6LfCHdcUAAAAAOwkHsW_7W7MfoOrvoIw9CXdLRBA"></script>
+	<script src="https://n138-kz.github.io/lib/grecaptcha.js"></script>
+	<style>
+		/* CSS */
+		progress {
+			/* ブラウザ標準のデザインをリセット */
+			-webkit-appearance: none;
+			appearance: none;
+			height: 20px;
+		}
+		progress::-webkit-progress-bar {
+			/* 背景色（トラック部分） */
+			background-color: #eee;
+			border-radius: 4px;
+		}
+
+		progress::-webkit-progress-value {
+			/* デフォルトのバーの色（例: 青） */
+			background-color: #007bff;
+			border-radius: 4px;
+			transition: background-color 0.3s ease;
+		}
+
+		progress[data-status="warning"]::-webkit-progress-value {
+			/* 条件ごとの色変更 */
+			background-color: orange; /* 0.8超〜0.9以下: 黄色 */
+		}
+
+		progress[data-status="danger"]::-webkit-progress-value {
+			/* 条件ごとの色変更 */
+			background-color: red; /* 0.9超: 赤色 */
+		}
+	</style>
+	<script>
+		const URL_ENDPOINT_LATEST_RESIN = '/get/jq/latest/';
+		const URL_ENDPOINT_HISTORY_RESIN = '/get/jq/history/';
+
+		const xhr_response={};
+		async function loop1(){
+			let output=document.querySelector('tbody');
+			output.textContent='';
+
+			let key=0;
+
+			key=Date.now();
+			xhr_response[key]={};
+			xhr_response[key]['raw']=await fetch(URL_ENDPOINT_LATEST_RESIN);
+			xhr_response[key]['json']=(xhr_response[key]['raw']['ok'])?xhr_response[key]['json']=await xhr_response[key]['raw'].json():null;
+			xhr_response['latest']=xhr_response[key];
+			console.log(xhr_response);
+
+			xhr_response[key]['json']['content'].forEach((e)=>{
+				console.log(e);
+				const dom=[];
+				dom[0]=document.createElement('tr');
+				{
+					dom[dom.length]=document.createElement('td');
+					{
+						dom[dom.length]=document.createTextNode('#');
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				{
+					dom[dom.length]=document.createElement('td');
+					{
+						let update_at=e.updated_at;
+						update_at=update_at*10**3;
+						update_at=new Date(update_at);
+						update_at=`${update_at.getMonth()+1}/${update_at.getDate()} ${update_at.getHours()}:${String(update_at.getMinutes()).padStart(2, '0')}:${String(update_at.getSeconds()).padStart(2, '0')}`;
+						
+						dom[dom.length]=document.createTextNode(update_at);
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				{
+					dom[dom.length]=document.createElement('td');
+					{
+						dom[dom.length]=document.createTextNode(e.player_name);
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				{
+					dom[dom.length]=document.createElement('td');
+					{
+						dom[dom.length]=document.createTextNode(e.player_signature);
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				{
+					dom[dom.length]=document.createElement('td');
+					{
+						dom[dom.length]=document.createElement('a');
+						dom[dom.length-1].href=`https://enka.network/u/${e.enka_uid}`;
+						dom[dom.length-1].target=`enka.network.u.${e.enka_uid}`;
+						dom[dom.length-1].innerText=e.enka_uid;
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				{
+					dom[dom.length]=document.createElement('td');
+					{
+						dom[dom.length]=document.createTextNode(e.current_resin);
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				{
+					dom[dom.length]=document.createElement('td');
+					{
+						dom[dom.length]=document.createTextNode(e.max_resin);
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				{
+					dom[dom.length]=document.createElement('td');
+					{
+						dom[dom.length]=document.createElement('progress');
+						dom[dom.length-1].value=(e.current_resin/e.max_resin);
+						dom[dom.length-1].dataset.status='';
+						if(false){
+						}else if(dom[dom.length-1].value>=0.9){
+							dom[dom.length-1].dataset.status='danger';
+						}else if(dom[dom.length-1].value>=0.8){
+							dom[dom.length-1].dataset.status='warning';
+						}
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					{
+						dom[dom.length]=document.createTextNode(`${((e.current_resin/e.max_resin)*100).toFixed(2)}%`);
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				{
+					dom[dom.length]=document.createElement('td');
+					{
+						let expire_at=Date.now()+(e.resin_recovery_time*10**3);
+						expire_at=new Date(expire_at);
+						expire_at=`${expire_at.getMonth()+1}/${expire_at.getDate()} ${expire_at.getHours()}:${String(expire_at.getMinutes()).padStart(2, '0')}:${String(expire_at.getSeconds()).padStart(2, '0')}`;
+
+						dom[dom.length]=document.createTextNode(expire_at);
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				output.appendChild(dom[0]);
+			});
+
+			key=Date.now();
+			xhr_response[key]={};
+			xhr_response[key]['raw']=await fetch(URL_ENDPOINT_HISTORY_RESIN);
+			xhr_response[key]['json']=(xhr_response[key]['raw']['ok'])?xhr_response[key]['json']=await xhr_response[key]['raw'].json():null;
+			xhr_response['history']=xhr_response[key];
+			console.log(xhr_response);
+			xhr_response[key]['json']['content'].forEach((e)=>{
+				console.log(e);
+				const dom=[];
+				dom[0]=document.createElement('tr');
+				{
+					dom[dom.length]=document.createElement('td');
+					{
+						dom[dom.length]=document.createTextNode(e.index);
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				{
+					dom[dom.length]=document.createElement('td');
+					{
+						let update_at=e.updated_at;
+						update_at=new Date(update_at);
+						update_at=`${update_at.getMonth()+1}/${update_at.getDate()} ${update_at.getHours()}:${String(update_at.getMinutes()).padStart(2, '0')}:${String(update_at.getSeconds()).padStart(2, '0')}`;
+						
+						dom[dom.length]=document.createTextNode(update_at);
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				{
+					dom[dom.length]=document.createElement('td');
+					{
+						dom[dom.length]=document.createTextNode(e.nickname);
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				{
+					dom[dom.length]=document.createElement('td');
+					{
+						dom[dom.length]=document.createTextNode(e.signature);
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				{
+					dom[dom.length]=document.createElement('td');
+					{
+						dom[dom.length]=document.createElement('a');
+						dom[dom.length-1].href=`https://enka.network/u/${e.uid}`;
+						dom[dom.length-1].target=`enka.network.u.${e.uid}`;
+						dom[dom.length-1].innerText=e.uid;
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				{
+					dom[dom.length]=document.createElement('td');
+					{
+						dom[dom.length]=document.createTextNode(e.current_resin);
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				{
+					dom[dom.length]=document.createElement('td');
+					{
+						dom[dom.length]=document.createTextNode(e.max_resin);
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				{
+					dom[dom.length]=document.createElement('td');
+					{
+						dom[dom.length]=document.createElement('progress');
+						dom[dom.length-1].value=(e.current_resin/e.max_resin);
+						dom[dom.length-1].dataset.status='';
+						if(false){
+						}else if(dom[dom.length-1].value>=0.9){
+							dom[dom.length-1].dataset.status='danger';
+						}else if(dom[dom.length-1].value>=0.8){
+							dom[dom.length-1].dataset.status='warning';
+						}
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					{
+						dom[dom.length]=document.createTextNode(`${((e.current_resin/e.max_resin)*100).toFixed(2)}%`);
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				{
+					dom[dom.length]=document.createElement('td');
+					{
+						let expire_at=new Date(e.full_recovery_at);
+						expire_at=`${expire_at.getMonth()+1}/${expire_at.getDate()} ${expire_at.getHours()}:${String(expire_at.getMinutes()).padStart(2, '0')}:${String(expire_at.getSeconds()).padStart(2, '0')}`;
+
+						dom[dom.length]=document.createTextNode(expire_at);
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				output.appendChild(dom[0]);
+			});
+		}
+		window.addEventListener('DOMContentLoaded', async ()=>{
+			setInterval(loop1(), 30*10**3);
+		});
+	</script>
+</head>
+<body>
+	<table border="1">
+		<thead>
+			<tr>
+				<td></td>
+				<th>updated_at</th>
+				<th>player_name</th>
+				<th>player_signature</th>
+				<th>enka_uid</th>
+				<th>current_resin</th>
+				<th>max_resin</th>
+				<th>current_resin_percent</th>
+				<th>resin_recovery_time</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+</body>
+</html>
