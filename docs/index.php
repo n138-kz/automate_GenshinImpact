@@ -245,10 +245,10 @@ function getContainerPublishPort($targetContainer = 'web'){
 		$publishedPort = $data['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'] ?? null;
 	} else {
 		$firstLine = strtok($headers, "\r\n");
-		error_log("Socket HTTP response error: {$firstLine}");
+		error_log("[".__FUNCTION__."] Socket HTTP response error: {$firstLine}");
 	}
 
-	error_log("Web Container Published Port: " . $publishedPort);
+	error_log("[".__FUNCTION__."] Web Container Published Port: " . $publishedPort);
 	return $publishedPort;
 }
 function main(){
