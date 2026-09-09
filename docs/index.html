@@ -325,7 +325,8 @@
 			});
 		}
 		window.addEventListener('DOMContentLoaded', async ()=>{
-			setInterval(loop1(), 30*10**3);
+			loop1();
+			setInterval(loop1, 30*10**3);
 		});
 	</script>
 </head>
