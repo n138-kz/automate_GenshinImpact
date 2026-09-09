@@ -55,7 +55,6 @@
 		const xhr_response={};
 		async function loop1(){
 			let output=document.querySelector('tbody');
-			output.textContent='';
 
 			let key=0;
 
@@ -66,6 +65,7 @@
 			xhr_response['latest']=xhr_response[key];
 			console.log(xhr_response);
 
+			output.textContent='';
 			xhr_response[key]['json']['content'].forEach((e)=>{
 				console.log(e);
 				const dom=[];
