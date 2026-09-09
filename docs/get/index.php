@@ -399,11 +399,11 @@ function main(){
 		}
 	}
 
-		if((bool)ini_get('display_errors')===false){
-			header('Content-Type: application/json');
-			$processtime['done']=microtime(TRUE);
-			echo json_encode(['content'=>$result, 'header'=>['processtime'=>$processtime]], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES).PHP_EOL;
-		}
+	if((bool)ini_get('display_errors')===false){
+		header('Content-Type: application/json');
+		$processtime['done']=microtime(TRUE);
+		echo json_encode(['content'=>$result, 'header'=>['processtime'=>$processtime]], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES).PHP_EOL;
+	}
 }
 
 if (realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
