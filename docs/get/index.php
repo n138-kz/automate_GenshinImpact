@@ -251,6 +251,34 @@ function getContainerPublishPort($targetContainer = 'web'){
 	error_log("[".__FUNCTION__."] Web Container Published Port: " . $publishedPort);
 	return $publishedPort;
 }
+function deleteDB_genshin_status_log_NotCompleteData(){
+	$database['host'] = $_ENV['INTERNAL_DB_HOST'] ?? 'db';
+	$database['port'] = $_ENV['INTERNAL_DB_PORT'] ?? '5432';
+	$database['db']   = $_ENV['INTERNAL_DB_DATABASE'] ?? 'myapp';
+	$database['user'] = $_ENV['INTERNAL_DB_USERNAME'] ?? 'postgres';
+	$database['pass'] = $_ENV['INTERNAL_DB_PASSWORD'] ?? 'password';
+	$database['conn'] = "pgsql:host={$database['host']};port={$database['port']};dbname={$database['db']}";
+	$database['activetable'] = 'genshin_status_log';
+	
+	try {
+		$pdo = new PDO($database['conn'], $database['user'], $database['pass'], [
+			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+		]);
+
+		$pdo->beginTransaction();
+
+		$sql = 'DELETE FROM genshin_status_log WHERE id IN ( SELECT index FROM genshin_status_log_view_php WHERE uid IS NULL OR nickname IS NULL OR current_resin IS NULL OR max_resin IS NULL OR full_recovery_at IS NULL);';
+		$stmt = $pdo->prepare($sql);
+		$stmt->execute();
+		$pdo->commit();
+	} catch (PDOException $e) {
+		$pdo->rollback();
+		error_log('Error has occured on '.__LINE__.', '.__FILE__);
+		error_log('PDO Error has occured: '.$e->getMessage());
+		return 'PDO Error has occured: '.$e->getMessage();
+	}
+	return NULL;
+}
 function main(){
 	global $processtime;
 
