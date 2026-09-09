@@ -68,3 +68,44 @@ CREATE OR REPLACE VIEW genshin_status_log_view_php AS
         NOW() + ((rawjson->'hoyolab'->>'resin_recovery_time')::BIGINT * '1 second'::INTERVAL) AS FULL_RECOVERY_AT
     FROM
         genshin_status_log;
+DROP VIEW IF EXISTS genshin_status_log_view_php_p;
+CREATE OR REPLACE VIEW genshin_status_log_view_php_p AS
+    SELECT
+        ID AS INDEX,
+        UPDATED_AT,
+        RAWJSON -> 'enka' ->> 'uid' AS UID,
+        RAWJSON -> 'enka' -> 'playerInfo' ->> 'nickname' AS NICKNAME,
+        RAWJSON -> 'enka' -> 'playerInfo' ->> 'signature' AS SIGNATURE,
+        RAWJSON -> 'hoyolab' ->> 'current_resin' AS CURRENT_RESIN,
+        RAWJSON -> 'hoyolab' ->> 'max_resin' AS MAX_RESIN,
+        RTRIM(
+            TO_CHAR(
+                (
+                    (RAWJSON -> 'hoyolab' ->> 'current_resin')::NUMERIC / (RAWJSON -> 'hoyolab' ->> 'max_resin')::NUMERIC * 100
+                ),
+                'FM990.99'
+            ),
+            '.'
+        ) || '%' AS CURRENT_RESIN_PERCENT,
+        REPEAT(
+            '■',
+            LEAST(
+                20,
+                ROUND(
+                    (RAWJSON -> 'hoyolab' ->> 'current_resin')::NUMERIC / (RAWJSON -> 'hoyolab' ->> 'max_resin')::NUMERIC * 20
+                )::INT
+            )
+        ) || REPEAT(
+            '□',
+            GREATEST(
+                0,
+                20 - ROUND(
+                    (RAWJSON -> 'hoyolab' ->> 'current_resin')::NUMERIC / (RAWJSON -> 'hoyolab' ->> 'max_resin')::NUMERIC * 20
+                )::INT
+            )
+        ) AS CURRENT_RESIN_BAR,
+        NOW() + (
+            (RAWJSON -> 'hoyolab' ->> 'resin_recovery_time')::BIGINT * '1 second'::INTERVAL
+        ) AS FULL_RECOVERY_AT
+    FROM
+        GENSHIN_STATUS_LOG;
