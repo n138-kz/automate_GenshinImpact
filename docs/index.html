@@ -70,6 +70,10 @@
 				console.log(e);
 				const dom=[];
 				dom[0]=document.createElement('tr');
+				dom[0].classList.add(`at_${initTime}`);
+				dom[0].classList.add(`${e.enka_uid}`);
+				dom[0].classList.add(`latest`);
+				dom[0].classList.add(`latest_${e.enka_uid}`);
 				{
 					dom[dom.length]=document.createElement('td');
 					{
@@ -198,6 +202,11 @@
 				console.log(e);
 				const dom=[];
 				dom[0]=document.createElement('tr');
+				dom[0].classList.add(`at_${initTime}`);
+				dom[0].classList.add(`${e.uid}`);
+				dom[0].classList.add(`history`);
+				dom[0].classList.add(`history_${e.uid}`);
+				dom[0].classList.add(`history_${e.index}`);
 				{
 					dom[dom.length]=document.createElement('td');
 					{
