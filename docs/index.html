@@ -24,6 +24,7 @@
 			-webkit-appearance: none;
 			appearance: none;
 			height: 20px;
+			max-width: 200px;
 		}
 		progress::-webkit-progress-bar {
 			/* 背景色（トラック部分） */
@@ -49,280 +50,613 @@
 		}
 	</style>
 	<script>
+		window.addEventListener('DOMContentLoaded', async ()=>{
+			const dom=[];
+			dom[0]=document.createElement('div');
+			dom[dom.length-1].style.height='200px';
+			{
+				dom[dom.length]=document.createElement('span');
+				{
+					dom[dom.length]=document.createTextNode(`${screen.availWidth}x${screen.availHeight} `);
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				dom[dom.length-2].appendChild(dom[dom.length-1]);
+				dom.pop();
+			}
+			{
+				dom[dom.length]=document.createElement('span');
+				{
+					dom[dom.length]=document.createTextNode(`${screen.width}x${screen.height} `);
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				dom[dom.length-2].appendChild(dom[dom.length-1]);
+				dom.pop();
+			}
+			{
+				dom[dom.length]=document.createElement('span');
+				{
+					dom[dom.length]=document.createTextNode(`${screen.orientation.type} `);
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				dom[dom.length-2].appendChild(dom[dom.length-1]);
+				dom.pop();
+			}
+			{
+				dom[dom.length]=document.createElement('span');
+				{
+					dom[dom.length]=document.createTextNode(`${screen.orientation.angle} `);
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				dom[dom.length-2].appendChild(dom[dom.length-1]);
+				dom.pop();
+			}
+			{
+				dom[dom.length]=document.createElement('span');
+				{
+					dom[dom.length]=document.createTextNode(window.navigator.userAgent.toLocaleLowerCase());
+					dom[dom.length-2].appendChild(dom[dom.length-1]);
+					dom.pop();
+				}
+				dom[dom.length-2].appendChild(dom[dom.length-1]);
+				dom.pop();
+			}
+			document.body.appendChild(dom[0]);
+			console.log(dom);
+		});
+	</script>
+	<script>
+		document.addEventListener('change', (e)=>{
+			if(e.target.tagName.toLocaleLowerCase()!=='input'){return;}
+			if(e.target.type.toLocaleLowerCase()!=='checkbox'){return;}
+			if(typeof e.target.dataset.uid === 'undefined'){return;}
+			
+			Array.from(document.querySelectorAll(`.history_${e.target.dataset.uid}`)).forEach((e2)=>{
+				if(e.target.checked){
+					e2.style.display='table-row';
+				}else{
+					e2.style.display='none';
+				}
+			});
+		});
+	</script>
+	<script>
 		const URL_ENDPOINT_LATEST_RESIN = '/get/jq/latest/';
 		const URL_ENDPOINT_HISTORY_RESIN = '/get/jq/history/';
 
 		const xhr_response={};
 		async function loop1(){
-			let output=document.querySelector('tbody');
+			if(screen.availWidth<500){
+				{
+					const dom=[];
+					dom[0]=document.createElement('meta');
+					dom[0].name='viewport';
+					dom[0].content='width=device-width,initial-scale=1';
+					document.head.appendChild(dom[0]);
+				}
 
-			let key=0;
-			let initTime=Date.now();
+				document.querySelector('tbody').parentElement.remove();
+				let output=document.querySelector('#output');
 
-			key=Date.now();
-			xhr_response[key]={};
-			xhr_response[key]['raw']=await fetch(URL_ENDPOINT_LATEST_RESIN);
-			xhr_response[key]['json']=(xhr_response[key]['raw']['ok'])?xhr_response[key]['json']=await xhr_response[key]['raw'].json():null;
-			xhr_response['latest']=xhr_response[key];
-			console.log(xhr_response);
+				let key=0;
+				let initTime=Date.now();
 
-			output.textContent='';
-			xhr_response[key]['json']['content'].forEach((e)=>{
-				console.log(e);
-				const dom=[];
-				dom[0]=document.createElement('tr');
-				dom[0].classList.add(`at_${initTime}`);
-				dom[0].classList.add(`${e.enka_uid}`);
-				dom[0].classList.add(`latest`);
-				dom[0].classList.add(`latest_${e.enka_uid}`);
-				{
-					dom[dom.length]=document.createElement('td');
+				key=Date.now();
+				xhr_response[key]={};
+				xhr_response[key]['raw']=await fetch(URL_ENDPOINT_LATEST_RESIN);
+				xhr_response[key]['json']=(xhr_response[key]['raw']['ok'])?xhr_response[key]['json']=await xhr_response[key]['raw'].json():null;
+				xhr_response['latest']=xhr_response[key];
+				console.debug(xhr_response);
+
+				output.textContent='';
+				xhr_response[key]['json']['content'].forEach((e)=>{
+					console.debug(e);
+					const dom=[];
+					dom[0]=document.createElement('table');
+					dom[0].border=1;
+					dom[0].style.marginBottom='10px';
+					dom[0].style.marginLeft='auto';
+					dom[0].style.marginRight='auto';
+					dom[0].classList.add(`at_${initTime}`);
+					dom[0].classList.add(`${e.enka_uid}`);
+					dom[0].classList.add(`latest`);
+					dom[0].classList.add(`latest_${e.enka_uid}`);
 					{
-						dom[dom.length]=document.createTextNode('#');
+						dom[dom.length]=document.createElement('tbody');
+						{
+							dom[dom.length]=document.createElement('tr');
+							{
+								dom[dom.length]=document.createElement('td');
+								{
+									dom[dom.length]=document.createTextNode('updated_at');
+									dom[dom.length-2].appendChild(dom[dom.length-1]);
+									dom.pop();
+								}
+								dom[dom.length-2].appendChild(dom[dom.length-1]);
+								dom.pop();
+							}
+							{
+								dom[dom.length]=document.createElement('td');
+								{
+									let update_at=e.updated_at;
+									update_at=update_at*10**3;
+									update_at=new Date(update_at);
+									update_at=`${update_at.getMonth()+1}/${update_at.getDate()} ${update_at.getHours()}:${String(update_at.getMinutes()).padStart(2, '0')}:${String(update_at.getSeconds()).padStart(2, '0')}`;
+									
+									dom[dom.length]=document.createTextNode(update_at);
+									dom[dom.length-2].appendChild(dom[dom.length-1]);
+									dom.pop();
+								}
+								dom[dom.length-2].appendChild(dom[dom.length-1]);
+								dom.pop();
+							}
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
+						{
+							dom[dom.length]=document.createElement('tr');
+							{
+								dom[dom.length]=document.createElement('td');
+								{
+									dom[dom.length]=document.createTextNode('name');
+									dom[dom.length-2].appendChild(dom[dom.length-1]);
+									dom.pop();
+								}
+								dom[dom.length-2].appendChild(dom[dom.length-1]);
+								dom.pop();
+							}
+							{
+								dom[dom.length]=document.createElement('td');
+								{
+									dom[dom.length]=document.createTextNode(e.player_name);
+									dom[dom.length-2].appendChild(dom[dom.length-1]);
+									dom.pop();
+								}
+								dom[dom.length-2].appendChild(dom[dom.length-1]);
+								dom.pop();
+							}
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
+						{
+							dom[dom.length]=document.createElement('tr');
+							{
+								dom[dom.length]=document.createElement('td');
+								{
+									dom[dom.length]=document.createTextNode('uid');
+									dom[dom.length-2].appendChild(dom[dom.length-1]);
+									dom.pop();
+								}
+								dom[dom.length-2].appendChild(dom[dom.length-1]);
+								dom.pop();
+							}
+							{
+								dom[dom.length]=document.createElement('td');
+								{
+									dom[dom.length]=document.createElement('a');
+									dom[dom.length-1].href=`https://enka.network/u/${e.enka_uid}`;
+									dom[dom.length-1].target=`enka.network.u.${e.enka_uid}`;
+									dom[dom.length-1].innerText=e.enka_uid;
+									dom[dom.length-2].appendChild(dom[dom.length-1]);
+									dom.pop();
+								}
+								dom[dom.length-2].appendChild(dom[dom.length-1]);
+								dom.pop();
+							}
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
+						{
+							dom[dom.length]=document.createElement('tr');
+							{
+								dom[dom.length]=document.createElement('td');
+								{
+									dom[dom.length]=document.createTextNode('resin');
+									dom[dom.length-2].appendChild(dom[dom.length-1]);
+									dom.pop();
+								}
+								dom[dom.length-2].appendChild(dom[dom.length-1]);
+								dom.pop();
+							}
+							{
+								dom[dom.length]=document.createElement('td');
+								{
+									dom[dom.length]=document.createTextNode(`${e.current_resin} / ${e.max_resin}`);
+									dom[dom.length-2].appendChild(dom[dom.length-1]);
+									dom.pop();
+								}
+								{
+									dom[dom.length]=document.createElement('progress');
+									dom[dom.length-1].value=(e.current_resin/e.max_resin)||0;
+									dom[dom.length-1].style.display='block';
+									dom[dom.length-1].dataset.status='';
+									if(false){
+									}else if(dom[dom.length-1].value>=0.9){
+										dom[dom.length-1].dataset.status='danger';
+									}else if(dom[dom.length-1].value>=0.8){
+										dom[dom.length-1].dataset.status='warning';
+									}
+									dom[dom.length-2].appendChild(dom[dom.length-1]);
+									dom.pop();
+								}
+								{
+									dom[dom.length]=document.createTextNode(`${(((e.current_resin/e.max_resin)||0)*100).toFixed(2)}%`);
+									dom[dom.length-2].appendChild(dom[dom.length-1]);
+									dom.pop();
+								}
+								dom[dom.length-2].appendChild(dom[dom.length-1]);
+								dom.pop();
+							}
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
+						{
+							dom[dom.length]=document.createElement('tr');
+							{
+								dom[dom.length]=document.createElement('td');
+								{
+									dom[dom.length]=document.createTextNode('fully_at');
+									dom[dom.length-2].appendChild(dom[dom.length-1]);
+									dom.pop();
+								}
+								dom[dom.length-2].appendChild(dom[dom.length-1]);
+								dom.pop();
+							}
+							{
+								dom[dom.length]=document.createElement('td');
+								{
+									let expire_at=Date.now()+(e.resin_recovery_time*10**3);
+									expire_at=new Date(expire_at);
+									expire_at=`${expire_at.getMonth()+1}/${expire_at.getDate()} ${expire_at.getHours()}:${String(expire_at.getMinutes()).padStart(2, '0')}:${String(expire_at.getSeconds()).padStart(2, '0')}`;
+
+									dom[dom.length]=document.createTextNode(expire_at);
+									dom[dom.length-2].appendChild(dom[dom.length-1]);
+									dom.pop();
+								}
+								dom[dom.length-2].appendChild(dom[dom.length-1]);
+								dom.pop();
+							}
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
 						dom[dom.length-2].appendChild(dom[dom.length-1]);
 						dom.pop();
 					}
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				{
-					dom[dom.length]=document.createElement('td');
+					output.appendChild(dom[0]);
+				});
+			}else{
+				let output=document.querySelector('tbody');
+
+				let key=0;
+				let initTime=Date.now();
+
+				key=Date.now();
+				xhr_response[key]={};
+				xhr_response[key]['raw']=await fetch(URL_ENDPOINT_LATEST_RESIN);
+				xhr_response[key]['json']=(xhr_response[key]['raw']['ok'])?xhr_response[key]['json']=await xhr_response[key]['raw'].json():null;
+				xhr_response['latest']=xhr_response[key];
+				console.debug(xhr_response);
+
+				output.textContent='';
+				xhr_response[key]['json']['content'].forEach((e)=>{
+					console.debug(e);
+
+					const dom=[];
+					dom[0]=document.createElement('tr');
+					dom[0].classList.add(`at_${initTime}`);
+					dom[0].classList.add(`${e.enka_uid}`);
+					dom[0].classList.add(`latest`);
+					dom[0].classList.add(`latest_${e.enka_uid}`);
 					{
-						let update_at=e.updated_at;
-						update_at=update_at*10**3;
-						update_at=new Date(update_at);
-						update_at=`${update_at.getMonth()+1}/${update_at.getDate()} ${update_at.getHours()}:${String(update_at.getMinutes()).padStart(2, '0')}:${String(update_at.getSeconds()).padStart(2, '0')}`;
-						
-						dom[dom.length]=document.createTextNode(update_at);
-						dom[dom.length-2].appendChild(dom[dom.length-1]);
-						dom.pop();
-					}
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				{
-					dom[dom.length]=document.createElement('td');
-					{
-						dom[dom.length]=document.createTextNode(e.player_name);
-						dom[dom.length-2].appendChild(dom[dom.length-1]);
-						dom.pop();
-					}
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				{
-					dom[dom.length]=document.createElement('td');
-					{
-						dom[dom.length]=document.createTextNode(e.player_signature);
-						dom[dom.length-2].appendChild(dom[dom.length-1]);
-						dom.pop();
-					}
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				{
-					dom[dom.length]=document.createElement('td');
-					{
-						dom[dom.length]=document.createElement('a');
-						dom[dom.length-1].href=`https://enka.network/u/${e.enka_uid}`;
-						dom[dom.length-1].target=`enka.network.u.${e.enka_uid}`;
-						dom[dom.length-1].innerText=e.enka_uid;
-						dom[dom.length-2].appendChild(dom[dom.length-1]);
-						dom.pop();
-					}
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				{
-					dom[dom.length]=document.createElement('td');
-					{
-						dom[dom.length]=document.createTextNode(e.current_resin);
-						dom[dom.length-2].appendChild(dom[dom.length-1]);
-						dom.pop();
-					}
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				{
-					dom[dom.length]=document.createElement('td');
-					{
-						dom[dom.length]=document.createTextNode(e.max_resin);
-						dom[dom.length-2].appendChild(dom[dom.length-1]);
-						dom.pop();
-					}
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				{
-					dom[dom.length]=document.createElement('td');
-					{
-						dom[dom.length]=document.createElement('progress');
-						dom[dom.length-1].value=(e.current_resin/e.max_resin)||0;
-						dom[dom.length-1].dataset.status='';
-						if(false){
-						}else if(dom[dom.length-1].value>=0.9){
-							dom[dom.length-1].dataset.status='danger';
-						}else if(dom[dom.length-1].value>=0.8){
-							dom[dom.length-1].dataset.status='warning';
+						dom[dom.length]=document.createElement('td');
+						{
+							dom[dom.length]=document.createElement('label');
+							{
+								dom[dom.length]=document.createTextNode('#');
+								dom[dom.length-2].appendChild(dom[dom.length-1]);
+								dom.pop();
+							}
+							{
+								dom[dom.length]=document.createElement('input');
+								dom[dom.length-1].type='checkbox';
+								dom[dom.length-1].checked=true;
+								dom[dom.length-1].dataset.uid=e.enka_uid;
+								dom[dom.length-2].appendChild(dom[dom.length-1]);
+								dom.pop();
+							}
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
 						}
 						dom[dom.length-2].appendChild(dom[dom.length-1]);
 						dom.pop();
 					}
 					{
-						dom[dom.length]=document.createTextNode(`${(((e.current_resin/e.max_resin)||0)*100).toFixed(2)}%`);
-						dom[dom.length-2].appendChild(dom[dom.length-1]);
-						dom.pop();
-					}
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				{
-					dom[dom.length]=document.createElement('td');
-					{
-						let expire_at=Date.now()+(e.resin_recovery_time*10**3);
-						expire_at=new Date(expire_at);
-						expire_at=`${expire_at.getMonth()+1}/${expire_at.getDate()} ${expire_at.getHours()}:${String(expire_at.getMinutes()).padStart(2, '0')}:${String(expire_at.getSeconds()).padStart(2, '0')}`;
-
-						dom[dom.length]=document.createTextNode(expire_at);
-						dom[dom.length-2].appendChild(dom[dom.length-1]);
-						dom.pop();
-					}
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				output.appendChild(dom[0]);
-			});
-
-			key=Date.now();
-			xhr_response[key]={};
-			xhr_response[key]['raw']=await fetch(URL_ENDPOINT_HISTORY_RESIN);
-			xhr_response[key]['json']=(xhr_response[key]['raw']['ok'])?xhr_response[key]['json']=await xhr_response[key]['raw'].json():null;
-			xhr_response['history']=xhr_response[key];
-			console.log(xhr_response);
-			xhr_response[key]['json']['content'].forEach((e)=>{
-				console.log(e);
-				const dom=[];
-				dom[0]=document.createElement('tr');
-				dom[0].classList.add(`at_${initTime}`);
-				dom[0].classList.add(`${e.uid}`);
-				dom[0].classList.add(`history`);
-				dom[0].classList.add(`history_${e.uid}`);
-				dom[0].classList.add(`history_${e.index}`);
-				{
-					dom[dom.length]=document.createElement('td');
-					{
-						dom[dom.length]=document.createTextNode(e.index);
-						dom[dom.length-2].appendChild(dom[dom.length-1]);
-						dom.pop();
-					}
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				{
-					dom[dom.length]=document.createElement('td');
-					{
-						let update_at=e.updated_at;
-						update_at=new Date(update_at);
-						update_at=`${update_at.getMonth()+1}/${update_at.getDate()} ${update_at.getHours()}:${String(update_at.getMinutes()).padStart(2, '0')}:${String(update_at.getSeconds()).padStart(2, '0')}`;
-						
-						dom[dom.length]=document.createTextNode(update_at);
-						dom[dom.length-2].appendChild(dom[dom.length-1]);
-						dom.pop();
-					}
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				{
-					dom[dom.length]=document.createElement('td');
-					{
-						dom[dom.length]=document.createTextNode(e.nickname);
-						dom[dom.length-2].appendChild(dom[dom.length-1]);
-						dom.pop();
-					}
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				{
-					dom[dom.length]=document.createElement('td');
-					{
-						dom[dom.length]=document.createTextNode(e.signature);
-						dom[dom.length-2].appendChild(dom[dom.length-1]);
-						dom.pop();
-					}
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				{
-					dom[dom.length]=document.createElement('td');
-					{
-						dom[dom.length]=document.createElement('a');
-						dom[dom.length-1].href=`https://enka.network/u/${e.uid}`;
-						dom[dom.length-1].target=`enka.network.u.${e.uid}`;
-						dom[dom.length-1].innerText=e.uid;
-						dom[dom.length-2].appendChild(dom[dom.length-1]);
-						dom.pop();
-					}
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				{
-					dom[dom.length]=document.createElement('td');
-					{
-						dom[dom.length]=document.createTextNode(e.current_resin);
-						dom[dom.length-2].appendChild(dom[dom.length-1]);
-						dom.pop();
-					}
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				{
-					dom[dom.length]=document.createElement('td');
-					{
-						dom[dom.length]=document.createTextNode(e.max_resin);
-						dom[dom.length-2].appendChild(dom[dom.length-1]);
-						dom.pop();
-					}
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				{
-					dom[dom.length]=document.createElement('td');
-					{
-						dom[dom.length]=document.createElement('progress');
-						dom[dom.length-1].value=(e.current_resin/e.max_resin)||0;
-						dom[dom.length-1].dataset.status='';
-						if(false){
-						}else if(dom[dom.length-1].value>=0.9){
-							dom[dom.length-1].dataset.status='danger';
-						}else if(dom[dom.length-1].value>=0.8){
-							dom[dom.length-1].dataset.status='warning';
+						dom[dom.length]=document.createElement('td');
+						{
+							let update_at=e.updated_at;
+							update_at=update_at*10**3;
+							update_at=new Date(update_at);
+							update_at=`${update_at.getMonth()+1}/${update_at.getDate()} ${update_at.getHours()}:${String(update_at.getMinutes()).padStart(2, '0')}:${String(update_at.getSeconds()).padStart(2, '0')}`;
+							
+							dom[dom.length]=document.createTextNode(update_at);
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
 						}
 						dom[dom.length-2].appendChild(dom[dom.length-1]);
 						dom.pop();
 					}
 					{
-						dom[dom.length]=document.createTextNode(`${((e.current_resin/e.max_resin)*100).toFixed(2)}%`);
+						dom[dom.length]=document.createElement('td');
+						{
+							dom[dom.length]=document.createTextNode(e.player_name);
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
 						dom[dom.length-2].appendChild(dom[dom.length-1]);
 						dom.pop();
 					}
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				{
-					dom[dom.length]=document.createElement('td');
 					{
-						let expire_at=new Date(e.full_recovery_at);
-						expire_at=`${expire_at.getMonth()+1}/${expire_at.getDate()} ${expire_at.getHours()}:${String(expire_at.getMinutes()).padStart(2, '0')}:${String(expire_at.getSeconds()).padStart(2, '0')}`;
-
-						dom[dom.length]=document.createTextNode(expire_at);
+						dom[dom.length]=document.createElement('td');
+						{
+							dom[dom.length]=document.createTextNode(e.player_signature);
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
 						dom[dom.length-2].appendChild(dom[dom.length-1]);
 						dom.pop();
 					}
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				output.appendChild(dom[0]);
-			});
+					{
+						dom[dom.length]=document.createElement('td');
+						{
+							dom[dom.length]=document.createElement('a');
+							dom[dom.length-1].href=`https://enka.network/u/${e.enka_uid}`;
+							dom[dom.length-1].target=`enka.network.u.${e.enka_uid}`;
+							dom[dom.length-1].innerText=e.enka_uid;
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					{
+						dom[dom.length]=document.createElement('td');
+						{
+							dom[dom.length]=document.createTextNode(e.current_resin);
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					{
+						dom[dom.length]=document.createElement('td');
+						{
+							dom[dom.length]=document.createTextNode(e.max_resin);
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					{
+						dom[dom.length]=document.createElement('td');
+						{
+							dom[dom.length]=document.createElement('table');
+							dom[dom.length-1].style.width='100%';
+							{
+								dom[dom.length]=document.createElement('tr');
+								{
+									dom[dom.length]=document.createElement('td');
+									{
+										dom[dom.length]=document.createElement('progress');
+										dom[dom.length-1].value=(e.current_resin/e.max_resin)||0;
+										dom[dom.length-1].dataset.status='';
+										if(false){
+										}else if(dom[dom.length-1].value>=0.9){
+											dom[dom.length-1].dataset.status='danger';
+										}else if(dom[dom.length-1].value>=0.8){
+											dom[dom.length-1].dataset.status='warning';
+										}
+										dom[dom.length-2].appendChild(dom[dom.length-1]);
+										dom.pop();
+									}
+									dom[dom.length-2].appendChild(dom[dom.length-1]);
+									dom.pop();
+								}
+								{
+									dom[dom.length]=document.createElement('td');
+									dom[dom.length-1].style.textAlign='right';
+									{
+										dom[dom.length]=document.createTextNode(`${(((e.current_resin/e.max_resin)||0)*100).toFixed(2)}%`);
+										dom[dom.length-2].appendChild(dom[dom.length-1]);
+										dom.pop();
+									}
+									dom[dom.length-2].appendChild(dom[dom.length-1]);
+									dom.pop();
+								}
+								dom[dom.length-2].appendChild(dom[dom.length-1]);
+								dom.pop();
+							}
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					{
+						dom[dom.length]=document.createElement('td');
+						{
+							let expire_at=Date.now()+(e.resin_recovery_time*10**3);
+							expire_at=new Date(expire_at);
+							expire_at=`${expire_at.getMonth()+1}/${expire_at.getDate()} ${expire_at.getHours()}:${String(expire_at.getMinutes()).padStart(2, '0')}:${String(expire_at.getSeconds()).padStart(2, '0')}`;
+
+							dom[dom.length]=document.createTextNode(expire_at);
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					output.appendChild(dom[0]);
+				});
+
+				key=Date.now();
+				xhr_response[key]={};
+				xhr_response[key]['raw']=await fetch(URL_ENDPOINT_HISTORY_RESIN);
+				xhr_response[key]['json']=(xhr_response[key]['raw']['ok'])?xhr_response[key]['json']=await xhr_response[key]['raw'].json():null;
+				xhr_response['history']=xhr_response[key];
+				console.debug(xhr_response);
+				xhr_response[key]['json']['content'].forEach((e)=>{
+					console.debug(e);
+
+					const dom=[];
+					dom[0]=document.createElement('tr');
+					dom[0].classList.add(`at_${initTime}`);
+					dom[0].classList.add(`${e.uid}`);
+					dom[0].classList.add(`history`);
+					dom[0].classList.add(`history_${e.uid}`);
+					dom[0].classList.add(`history_${e.index}`);
+					{
+						dom[dom.length]=document.createElement('td');
+						{
+							dom[dom.length]=document.createTextNode(e.index);
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					{
+						dom[dom.length]=document.createElement('td');
+						{
+							let update_at=e.updated_at;
+							update_at=new Date(update_at);
+							update_at=`${update_at.getMonth()+1}/${update_at.getDate()} ${update_at.getHours()}:${String(update_at.getMinutes()).padStart(2, '0')}:${String(update_at.getSeconds()).padStart(2, '0')}`;
+							
+							dom[dom.length]=document.createTextNode(update_at);
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					{
+						dom[dom.length]=document.createElement('td');
+						{
+							dom[dom.length]=document.createTextNode(e.nickname);
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					{
+						dom[dom.length]=document.createElement('td');
+						{
+							dom[dom.length]=document.createTextNode(e.signature);
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					{
+						dom[dom.length]=document.createElement('td');
+						{
+							dom[dom.length]=document.createElement('a');
+							dom[dom.length-1].href=`https://enka.network/u/${e.uid}`;
+							dom[dom.length-1].target=`enka.network.u.${e.uid}`;
+							dom[dom.length-1].innerText=e.uid;
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					{
+						dom[dom.length]=document.createElement('td');
+						{
+							dom[dom.length]=document.createTextNode(e.current_resin);
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					{
+						dom[dom.length]=document.createElement('td');
+						{
+							dom[dom.length]=document.createTextNode(e.max_resin);
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					{
+						dom[dom.length]=document.createElement('td');
+						{
+							dom[dom.length]=document.createElement('table');
+							dom[dom.length-1].style.width='100%';
+							{
+								dom[dom.length]=document.createElement('tr');
+								{
+									dom[dom.length]=document.createElement('td');
+									{
+										dom[dom.length]=document.createElement('progress');
+										dom[dom.length-1].value=(e.current_resin/e.max_resin)||0;
+										dom[dom.length-1].dataset.status='';
+										if(false){
+										}else if(dom[dom.length-1].value>=0.9){
+											dom[dom.length-1].dataset.status='danger';
+										}else if(dom[dom.length-1].value>=0.8){
+											dom[dom.length-1].dataset.status='warning';
+										}
+										dom[dom.length-2].appendChild(dom[dom.length-1]);
+										dom.pop();
+									}
+									dom[dom.length-2].appendChild(dom[dom.length-1]);
+									dom.pop();
+								}
+								{
+									dom[dom.length]=document.createElement('td');
+									dom[dom.length-1].style.textAlign='right';
+									{
+										dom[dom.length]=document.createTextNode(`${(((e.current_resin/e.max_resin)||0)*100).toFixed(2)}%`);
+										dom[dom.length-2].appendChild(dom[dom.length-1]);
+										dom.pop();
+									}
+									dom[dom.length-2].appendChild(dom[dom.length-1]);
+									dom.pop();
+								}
+								dom[dom.length-2].appendChild(dom[dom.length-1]);
+								dom.pop();
+							}
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					{
+						dom[dom.length]=document.createElement('td');
+						{
+							let expire_at=new Date(e.full_recovery_at);
+							expire_at=`${expire_at.getMonth()+1}/${expire_at.getDate()} ${expire_at.getHours()}:${String(expire_at.getMinutes()).padStart(2, '0')}:${String(expire_at.getSeconds()).padStart(2, '0')}`;
+
+							dom[dom.length]=document.createTextNode(expire_at);
+							dom[dom.length-2].appendChild(dom[dom.length-1]);
+							dom.pop();
+						}
+						dom[dom.length-2].appendChild(dom[dom.length-1]);
+						dom.pop();
+					}
+					output.appendChild(dom[0]);
+				});
+			}
 		}
 		window.addEventListener('DOMContentLoaded', async ()=>{
 			loop1();
@@ -331,21 +665,23 @@
 	</script>
 </head>
 <body>
-	<table border="1">
-		<thead>
-			<tr>
-				<td></td>
-				<th>updated_at</th>
-				<th>player_name</th>
-				<th>player_signature</th>
-				<th>enka_uid</th>
-				<th>current_resin</th>
-				<th>max_resin</th>
-				<th>current_resin_percent</th>
-				<th>resin_recovery_time</th>
-			</tr>
-		</thead>
-		<tbody></tbody>
-	</table>
+	<div id="output">
+		<table border=1>
+			<thead>
+				<tr>
+					<td></td>
+					<th>updated_at</th>
+					<th>player_name</th>
+					<th>player_signature</th>
+					<th>enka_uid</th>
+					<th>current_resin</th>
+					<th>max_resin</th>
+					<th>current_resin_percent</th>
+					<th>resin_recovery_time</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
 </body>
 </html>
