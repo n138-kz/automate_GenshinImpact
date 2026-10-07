@@ -50,65 +50,6 @@
 		}
 	</style>
 	<script>
-		window.addEventListener('DOMContentLoaded', async ()=>{
-			const dom=[];
-			dom[0]=document.createElement('div');
-			dom[dom.length-1].style.height='200px';
-			{
-				dom[dom.length]=document.createElement('span');
-				{
-					dom[dom.length]=document.createTextNode(`${screen.availWidth}x${screen.availHeight} `);
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				dom[dom.length-2].appendChild(dom[dom.length-1]);
-				dom.pop();
-			}
-			{
-				dom[dom.length]=document.createElement('span');
-				{
-					dom[dom.length]=document.createTextNode(`${screen.width}x${screen.height} `);
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				dom[dom.length-2].appendChild(dom[dom.length-1]);
-				dom.pop();
-			}
-			{
-				dom[dom.length]=document.createElement('span');
-				{
-					dom[dom.length]=document.createTextNode(`${screen.orientation.type} `);
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				dom[dom.length-2].appendChild(dom[dom.length-1]);
-				dom.pop();
-			}
-			{
-				dom[dom.length]=document.createElement('span');
-				{
-					dom[dom.length]=document.createTextNode(`${screen.orientation.angle} `);
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				dom[dom.length-2].appendChild(dom[dom.length-1]);
-				dom.pop();
-			}
-			{
-				dom[dom.length]=document.createElement('span');
-				{
-					dom[dom.length]=document.createTextNode(window.navigator.userAgent.toLocaleLowerCase());
-					dom[dom.length-2].appendChild(dom[dom.length-1]);
-					dom.pop();
-				}
-				dom[dom.length-2].appendChild(dom[dom.length-1]);
-				dom.pop();
-			}
-			document.body.appendChild(dom[0]);
-			console.log(dom);
-		});
-	</script>
-	<script>
 		document.addEventListener('change', (e)=>{
 			if(e.target.tagName.toLocaleLowerCase()!=='input'){return;}
 			if(e.target.type.toLocaleLowerCase()!=='checkbox'){return;}
